@@ -1,0 +1,332 @@
+'use client';
+
+import { 
+  HeroSection, 
+  Navigation
+} from '@/components/ui';
+
+// Navigation links
+const navigationLinks = [
+  { label: 'Home', href: '/', isActive: true },
+  { label: 'Menu', href: '/menu' },
+  { label: 'About', href: '/about' },
+  { label: 'Gallery', href: '/gallery' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'Reservations', href: '/reservations' }
+];
+
+export default function DesignSystemShowcase() {
+  return (
+    <div className="min-h-screen bg-cream-50">
+      {/* Navigation */}
+      <Navigation
+        logo={{ text: 'Culinary Studio', href: '/' }}
+        links={navigationLinks}
+        variant="blur"
+        scrollEffect={true}
+      />
+
+      {/* Hero Section */}
+      <HeroSection
+        title="Culinary Excellence"
+        subtitle="A Journey Through Fine Dining"
+        description="Experience the artistry of exceptional cuisine crafted with passion, precision, and the finest ingredients."
+        ctaButton={{
+          text: 'Explore Menu',
+          href: '/menu'
+        }}
+        variant="minimal"
+        height="screen"
+        overlay="gradient"
+      />
+
+      {/* Design System Overview */}
+      <section className="py-32 bg-white">
+        <div className="max-w-screen-2xl mx-auto px-8 lg:px-16">
+          {/* Section Header */}
+          <div className="text-center mb-32">
+            <h2 className="font-serif text-7xl lg:text-8xl font-light text-charcoal-900 mb-12 tracking-tight">
+              Design System Components
+            </h2>
+            <div className="w-32 h-0.5 bg-sage-300 mx-auto mb-12"></div>
+            <p className="text-2xl text-charcoal-600 max-w-5xl mx-auto leading-relaxed">
+              Our sophisticated UI components are meticulously crafted to capture the elegance and refinement of fine dining, 
+              blending functionality with artistry to create exceptional digital experiences.
+            </p>
+          </div>
+          
+          {/* Component Grid */}
+          <div className="grid grid-cols-3 gap-16 xl:gap-24">
+            {/* ImageCard Component */}
+            <div className="group text-center">
+              <div className="relative mb-12">
+                <div className="w-32 h-32 bg-gradient-to-br from-cream-100 to-cream-200 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110">
+                  <span className="text-5xl opacity-80">🎨</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-3xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                ImageCard
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed text-lg max-w-sm mx-auto">
+                Sophisticated image cards with multiple variants, rating systems, and chef attribution for showcasing culinary creations with elegance.
+              </p>
+            </div>
+
+            {/* GalleryGrid Component */}
+            <div className="group text-center">
+              <div className="relative mb-12">
+                <div className="w-32 h-32 bg-gradient-to-br from-sage-100 to-sage-200 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110">
+                  <span className="text-5xl opacity-80">🖼️</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-3xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                GalleryGrid
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed text-lg max-w-sm mx-auto">
+                Dynamic gallery grid with advanced filtering, search, and sorting capabilities for organizing culinary portfolios with precision.
+              </p>
+            </div>
+
+            {/* HeroSection Component */}
+            <div className="group text-center">
+              <div className="relative mb-12">
+                <div className="w-32 h-32 bg-gradient-to-br from-copper-100 to-copper-200 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110">
+                  <span className="text-5xl opacity-80">🎭</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-3xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                HeroSection
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed text-lg max-w-sm mx-auto">
+                Elegant hero sections with parallax effects, multiple variants, and chef-focused layouts for impactful first impressions.
+              </p>
+            </div>
+
+            {/* Navigation Component */}
+            <div className="group text-center">
+              <div className="relative mb-12">
+                <div className="w-32 h-32 bg-gradient-to-br from-cream-100 to-sage-200 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110">
+                  <span className="text-5xl opacity-80">🧭</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-3xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                Navigation
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed text-lg max-w-sm mx-auto">
+                Responsive navigation with scroll effects, multiple themes, and smooth animations for seamless user experiences.
+              </p>
+            </div>
+
+            {/* Lightbox Component */}
+            <div className="group text-center">
+              <div className="relative mb-12">
+                <div className="w-32 h-32 bg-gradient-to-br from-copper-100 to-charcoal-200 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110">
+                  <span className="text-5xl opacity-80">🔍</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-3xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                Lightbox
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed text-lg max-w-sm mx-auto">
+                Advanced lightbox with zoom capabilities, metadata panels, and social sharing for detailed culinary image viewing.
+              </p>
+            </div>
+
+            {/* Animations */}
+            <div className="group text-center">
+              <div className="relative mb-12">
+                <div className="w-32 h-32 bg-gradient-to-br from-sage-100 to-copper-200 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110">
+                  <span className="text-5xl opacity-80">✨</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-3xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                Animations
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed text-lg max-w-sm mx-auto">
+                Smooth Framer Motion animations throughout all components for a premium, refined user experience.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+            {/* ImageCard Component */}
+            <div className="group text-center">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-cream-100 to-cream-200 rounded-2xl flex items-center justify-center mx-auto shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105">
+                  <span className="text-3xl opacity-80">🎨</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-4 tracking-wide">
+                ImageCard
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed max-w-xs mx-auto">
+                Sophisticated image cards with multiple variants, rating systems, and chef attribution for showcasing culinary creations with elegance.
+              </p>
+            </div>
+
+            {/* GalleryGrid Component */}
+            <div className="group text-center">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-sage-100 to-sage-200 rounded-2xl flex items-center justify-center mx-auto shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105">
+                  <span className="text-3xl opacity-80">🖼️</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-4 tracking-wide">
+                GalleryGrid
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed max-w-xs mx-auto">
+                Dynamic gallery grid with advanced filtering, search, and sorting capabilities for organizing culinary portfolios with precision.
+              </p>
+            </div>
+
+            {/* HeroSection Component */}
+            <div className="group text-center">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-copper-100 to-copper-200 rounded-2xl flex items-center justify-center mx-auto shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105">
+                  <span className="text-3xl opacity-80">🎭</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-4 tracking-wide">
+                HeroSection
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed max-w-xs mx-auto">
+                Elegant hero sections with parallax effects, multiple variants, and chef-focused layouts for impactful first impressions.
+              </p>
+            </div>
+
+            {/* Navigation Component */}
+            <div className="group text-center">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-cream-100 to-sage-200 rounded-2xl flex items-center justify-center mx-auto shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105">
+                  <span className="text-3xl opacity-80">🧭</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-4 tracking-wide">
+                Navigation
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed max-w-xs mx-auto">
+                Responsive navigation with scroll effects, multiple themes, and smooth animations for seamless user experiences.
+              </p>
+            </div>
+
+            {/* Lightbox Component */}
+            <div className="group text-center">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-copper-100 to-charcoal-200 rounded-2xl flex items-center justify-center mx-auto shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105">
+                  <span className="text-3xl opacity-80">🔍</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-4 tracking-wide">
+                Lightbox
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed max-w-xs mx-auto">
+                Advanced lightbox with zoom capabilities, metadata panels, and social sharing for detailed culinary image viewing.
+              </p>
+            </div>
+
+            {/* Animations */}
+            <div className="group text-center">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-sage-100 to-copper-200 rounded-2xl flex items-center justify-center mx-auto shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105">
+                  <span className="text-3xl opacity-80">✨</span>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-4 tracking-wide">
+                Animations
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed max-w-xs mx-auto">
+                Smooth Framer Motion animations throughout all components for a premium, refined user experience.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Chef Hero Section */}
+      <section className="bg-charcoal-900">
+        <HeroSection
+          title="Meet Our Chef"
+          subtitle="Culinary Artist"
+          description="With over 15 years of experience in Michelin-starred restaurants, our chef brings unparalleled expertise and creativity to every dish."
+          chef={{
+            name: "Chef Marcus Thompson",
+            title: "Executive Chef & Owner"
+          }}
+          ctaButton={{
+            text: 'Learn More',
+            href: '/about'
+          }}
+          variant="chef"
+          height="large"
+          overlay="dark"
+        />
+      </section>
+
+      {/* Design Philosophy */}
+      <section className="py-28 bg-cream-50">
+        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
+          {/* Section Header */}
+          <div className="text-center mb-20">
+            <h2 className="font-serif text-5xl md:text-6xl font-light text-charcoal-900 mb-8 tracking-tight">
+              Design Philosophy
+            </h2>
+            <div className="w-24 h-px bg-sage-300 mx-auto mb-10"></div>
+            <p className="text-xl text-charcoal-600 leading-relaxed max-w-4xl mx-auto">
+              Our design system draws inspiration from the elegance and sophistication of fine dining establishments. 
+              Every component is crafted with meticulous attention to detail, reflecting the same precision and artistry 
+              that defines exceptional cuisine.
+            </p>
+          </div>
+          
+          {/* Philosophy Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+            <div className="text-center group">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto group-hover:shadow-md transition-all duration-300">
+                  <div className="w-8 h-8 bg-charcoal-900 rounded-lg"></div>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                Elegance
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Clean lines, sophisticated typography, and refined color palettes that convey luxury, quality, 
+                and the timeless beauty of culinary artistry.
+              </p>
+            </div>
+            
+            <div className="text-center group">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto group-hover:shadow-md transition-all duration-300">
+                  <div className="w-8 h-8 bg-gradient-to-br from-sage-400 to-sage-600 rounded-lg"></div>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                Functionality
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Intuitive interactions and seamless user experiences that make browsing culinary content effortless, 
+                ensuring every gesture feels natural and purposeful.
+              </p>
+            </div>
+            
+            <div className="text-center group">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto group-hover:shadow-md transition-all duration-300">
+                  <div className="w-8 h-8 bg-gradient-to-br from-copper-300 to-copper-500 rounded-lg"></div>
+                </div>
+              </div>
+              <h3 className="font-serif text-2xl font-medium text-charcoal-900 mb-6 tracking-wide">
+                Artistry
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Beautiful animations and thoughtful details that enhance the visual storytelling of culinary creations, 
+                creating moments of delight and discovery.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

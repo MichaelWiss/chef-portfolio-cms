@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chef Portfolio - Landing Page Mockup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .font-display { font-family: 'Playfair Display', Georgia, serif; }
+        .font-sans { font-family: 'Inter', system-ui, sans-serif; }
+        
+        /* Custom color palette */
+        :root {
+            --stone-50: #fafaf9;
+            --stone-100: #f5f5f4;
+            --stone-200: #e7e5e4;
+            --stone-300: #d6d3d1;
+            --stone-400: #a8a29e;
+            --stone-500: #78716c;
+            --stone-600: #57534e;
+            --stone-700: #44403c;
+            --stone-800: #292524;
+            --stone-900: #1c1917;
+            
+            --sage-500: #5d7c5d;
+            --sage-600: #4a634a;
+            --cream-100: #fefcf0;
+            --copper-500: #bfa094;
+        }
+        
+        .bg-stone-50 { background-color: var(--stone-50); }
+        .bg-stone-100 { background-color: var(--stone-100); }
+        .bg-stone-900 { background-color: var(--stone-900); }
+        .text-stone-300 { color: var(--stone-300); }
+        .text-stone-600 { color: var(--stone-600); }
+        .text-stone-700 { color: var(--stone-700); }
+        .text-stone-900 { color: var(--stone-900); }
+        .border-stone-300 { border-color: var(--stone-300); }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .image-placeholder {
+            background: linear-gradient(135deg, var(--stone-200) 0%, var(--stone-100) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .image-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: var(--stone-400);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-4.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z'/%3E%3C/svg%3E") no-repeat center;
+            mask-size: contain;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--stone-900) 0%, var(--stone-800) 50%, var(--stone-700) 100%);
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .animate-delay-100 { animation-delay: 0.1s; }
+        .animate-delay-200 { animation-delay: 0.2s; }
+        .animate-delay-300 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body class="font-sans bg-white text-stone-900">
+    
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center hero-gradient text-white overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1.5\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+        
+        <!-- Content -->
+        <div class="relative text-center space-y-8 max-w-4xl mx-auto px-6 z-10">
+            <h1 class="font-display text-5xl md:text-7xl font-light tracking-wide animate-fade-in-up">
+                Culinary Artistry
+            </h1>
+            <p class="text-xl md:text-2xl text-stone-300 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animate-delay-100">
+                Where seasonal ingredients meet creative passion, crafting unforgettable dining experiences with every dish.
+            </p>
+            <div class="pt-8 animate-fade-in-up animate-delay-200">
+                <a href="#portfolio" class="inline-block px-10 py-4 border-2 border-white text-white hover:bg-white hover:text-stone-900 transition-all duration-300 text-lg font-medium tracking-wide">
+                    View Portfolio
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+            <div class="animate-bounce">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chef Profile Section -->
+    <section id="about" class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+            <h2 class="font-display text-4xl md:text-5xl font-light text-stone-900 mb-6">
+                Meet the Chef
+            </h2>
+            <p class="text-xl text-stone-600 max-w-2xl mx-auto leading-relaxed">
+                Discover the passion and expertise behind every carefully crafted dish.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Chef Image -->
+            <div class="relative">
+                <div class="aspect-[3/4] image-placeholder rounded-lg shadow-lg"></div>
+            </div>
+
+            <!-- Chef Information -->
+            <div class="space-y-8">
+                <div>
+                    <h3 class="font-display text-3xl font-medium text-stone-900 mb-3">
+                        Alexandra Chen
+                    </h3>
+                    <p class="text-xl text-stone-600 mb-6">
+                        Executive Chef & Culinary Artist
+                    </p>
+                    
+                    <div class="flex items-center gap-3 text-stone-500 mb-6">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>San Francisco, California</span>
+                    </div>
+                </div>
+
+                <div class="prose prose-lg prose-stone max-w-none">
+                    <p class="text-stone-700 leading-relaxed">
+                        With over 15 years of culinary experience, I believe that food is not just sustenance—it's storytelling on a plate. My approach combines classical French techniques with seasonal California ingredients, creating dishes that honor tradition while embracing innovation.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold text-stone-900 mb-4">Specialties</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm">Modern French</span>
+                        <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm">Seasonal Cuisine</span>
+                        <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm">Farm-to-Table</span>
+                        <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm">Pastry Arts</span>
+                    </div>
+                </div>
+
+                <div class="bg-stone-50 rounded-lg p-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-stone-900 font-display">15+</div>
+                        <div class="text-sm text-stone-600">Years of Experience</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-24 px-6 bg-stone-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-4xl md:text-5xl font-light text-stone-900 mb-6">
+                    Signature Dishes
+                </h2>
+                <p class="text-xl text-stone-600 max-w-2xl mx-auto leading-relaxed">
+                    Each dish tells a story of seasonal ingredients, innovative techniques, and culinary passion.
+                </p>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="flex flex-wrap gap-3 justify-center mb-12">
+                <button class="px-6 py-3 bg-stone-900 text-white rounded-full text-sm font-medium">All Dishes</button>
+                <button class="px-6 py-3 bg-white text-stone-700 hover:bg-stone-100 rounded-full text-sm font-medium transition-colors">Appetizers</button>
+                <button class="px-6 py-3 bg-white text-stone-700 hover:bg-stone-100 rounded-full text-sm font-medium transition-colors">Main Courses</button>
+                <button class="px-6 py-3 bg-white text-stone-700 hover:bg-stone-100 rounded-full text-sm font-medium transition-colors">Desserts</button>
+                <button class="px-6 py-3 bg-white text-stone-700 hover:bg-stone-100 rounded-full text-sm font-medium transition-colors">Beverages</button>
+            </div>
+
+            <!-- Dishes Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Dish Card 1 -->
+                <div class="group cursor-pointer">
+                    <div class="aspect-[4/3] image-placeholder rounded-lg mb-6 group-hover:shadow-lg transition-shadow duration-300"></div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-semibold text-stone-900 group-hover:text-stone-700 transition-colors">
+                                Seared Duck Breast
+                            </h3>
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">Medium</span>
+                        </div>
+                        <p class="text-stone-600 text-sm leading-relaxed">
+                            Pan-seared duck breast with cherry gastrique, roasted fingerling potatoes, and seasonal vegetables.
+                        </p>
+                        <div class="flex items-center gap-4 text-xs text-stone-500">
+                            <div class="flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>45min prep</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span>4 servings</span>
+                            </div>
+                            <span class="capitalize">Autumn</span>
+                        </div>
+                        <span class="inline-block px-3 py-1 bg-stone-100 text-stone-700 text-xs rounded-full">Main Course</span>
+                    </div>
+                </div>
+
+                <!-- Dish Card 2 -->
+                <div class="group cursor-pointer">
+                    <div class="aspect-[4/3] image-placeholder rounded-lg mb-6 group-hover:shadow-lg transition-shadow duration-300"></div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-semibold text-stone-900 group-hover:text-stone-700 transition-colors">
+                                Chocolate Soufflé
+                            </h3>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">Hard</span>
+                        </div>
+                        <p class="text-stone-600 text-sm leading-relaxed">
+                            Rich dark chocolate soufflé with vanilla bean crème anglaise and fresh berry compote.
+                        </p>
+                        <div class="flex items-center gap-4 text-xs text-stone-500">
+                            <div class="flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>30min prep</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span>6 servings</span>
+                            </div>
+                            <span class="capitalize">Year-round</span>
+                        </div>
+                        <span class="inline-block px-3 py-1 bg-stone-100 text-stone-700 text-xs rounded-full">Dessert</span>
+                    </div>
+                </div>
+
+                <!-- Dish Card 3 -->
+                <div class="group cursor-pointer">
+                    <div class="aspect-[4/3] image-placeholder rounded-lg mb-6 group-hover:shadow-lg transition-shadow duration-300"></div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-semibold text-stone-900 group-hover:text-stone-700 transition-colors">
+                                Burrata & Peach
+                            </h3>
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">Easy</span>
+                        </div>
+                        <p class="text-stone-600 text-sm leading-relaxed">
+                            Fresh burrata with grilled peaches, arugula, prosciutto, and honey-balsamic reduction.
+                        </p>
+                        <div class="flex items-center gap-4 text-xs text-stone-500">
+                            <div class="flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>15min prep</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span>2 servings</span>
+                            </div>
+                            <span class="capitalize">Summer</span>
+                        </div>
+                        <span class="inline-block px-3 py-1 bg-stone-100 text-stone-700 text-xs rounded-full">Appetizer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-24 px-6 max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="font-display text-4xl md:text-5xl font-light text-stone-900 mb-6">
+                Stay Connected
+            </h2>
+            <p class="text-xl text-stone-600 max-w-2xl mx-auto leading-relaxed">
+                Join our community to receive updates on seasonal menus, exclusive events, and culinary insights.
+            </p>
+        </div>
+        
+        <div class="max-w-lg mx-auto">
+            <div class="bg-stone-50 rounded-lg p-8">
+                <h3 class="text-xl font-semibold text-stone-900 mb-4">
+                    Join Our Culinary Journey
+                </h3>
+                <p class="text-stone-600 mb-6">
+                    Subscribe for seasonal menu updates, exclusive recipes, and special event invitations.
+                </p>
+                
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">
+                            First Name (optional)
+                        </label>
+                        <input type="text" placeholder="Your first name" 
+                               class="w-full px-4 py-3 border border-stone-300 rounded-md focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors"/>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">
+                            Email Address *
+                        </label>
+                        <input type="email" placeholder="your.email@example.com" required
+                               class="w-full px-4 py-3 border border-stone-300 rounded-md focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors"/>
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full bg-stone-900 text-white px-6 py-3 rounded-md hover:bg-stone-800 transition-colors font-medium">
+                        Subscribe
+                    </button>
+                </form>
+                
+                <p class="text-xs text-stone-500 mt-4 text-center">
+                    We respect your privacy. Unsubscribe at any time.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-white py-16 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-8">
+                <h3 class="font-display text-2xl font-light mb-4">Alexandra Chen</h3>
+                <p class="text-stone-400 max-w-md mx-auto">
+                    Crafting exceptional culinary experiences with passion, creativity, and seasonal excellence.
+                </p>
+            </div>
+            
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="#" class="text-stone-400 hover:text-white transition-colors">Instagram</a>
+                <a href="#" class="text-stone-400 hover:text-white transition-colors">LinkedIn</a>
+                <a href="#" class="text-stone-400 hover:text-white transition-colors">Contact</a>
+            </div>
+            
+            <p class="text-stone-400 text-sm">
+                © 2025 Chef Portfolio. Crafted with passion for culinary excellence.
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

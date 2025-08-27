@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/chef-profile",
+      "handler": "chef-profile.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/chef-profile",
+      "handler": "chef-profile.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/chef-profile",
+      "handler": "chef-profile.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
