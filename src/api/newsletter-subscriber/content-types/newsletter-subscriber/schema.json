@@ -1,0 +1,136 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsletter_subscribers",
+  "info": {
+    "singularName": "newsletter-subscriber",
+    "pluralName": "newsletter-subscribers",
+    "displayName": "Newsletter Subscriber",
+    "description": "Email subscriber management with preferences and segmentation"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "firstName": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "lastName": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "subscriptionDate": {
+      "type": "datetime",
+      "required": true
+    },
+    "subscriptionSource": {
+      "type": "enumeration",
+      "enum": [
+        "website",
+        "event",
+        "social-media",
+        "referral",
+        "restaurant",
+        "press",
+        "manual-import"
+      ],
+      "default": "website"
+    },
+    "preferences": {
+      "type": "json"
+    },
+    "interests": {
+      "type": "json"
+    },
+    "subscriberStatus": {
+      "type": "enumeration",
+      "enum": [
+        "active",
+        "unsubscribed",
+        "bounced",
+        "complained",
+        "pending"
+      ],
+      "default": "active"
+    },
+    "vipStatus": {
+      "type": "boolean",
+      "default": false
+    },
+    "location": {
+      "type": "string"
+    },
+    "dietaryRestrictions": {
+      "type": "json"
+    },
+    "favoriteType": {
+      "type": "enumeration",
+      "enum": [
+        "recipes",
+        "restaurant-updates",
+        "events",
+        "behind-the-scenes",
+        "all"
+      ],
+      "default": "all"
+    },
+    "lastEmailOpened": {
+      "type": "datetime"
+    },
+    "lastEmailClicked": {
+      "type": "datetime"
+    },
+    "totalEmailsOpened": {
+      "type": "integer",
+      "default": 0
+    },
+    "totalEmailsClicked": {
+      "type": "integer",
+      "default": 0
+    },
+    "engagementScore": {
+      "type": "decimal",
+      "default": 0
+    },
+    "unsubscribeDate": {
+      "type": "datetime"
+    },
+    "unsubscribeReason": {
+      "type": "text"
+    },
+    "notes": {
+      "type": "text"
+    },
+    "tags": {
+      "type": "json"
+    },
+    "externalId": {
+      "type": "string"
+    },
+    "doubleOptIn": {
+      "type": "boolean",
+      "default": false
+    },
+    "confirmationDate": {
+      "type": "datetime"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "text"
+    },
+    "referrerUrl": {
+      "type": "string"
+    },
+    "customFields": {
+      "type": "json"
+    }
+  }
+}

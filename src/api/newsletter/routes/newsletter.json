@@ -1,0 +1,76 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/newsletters",
+      "handler": "newsletter.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletters/status/:status",
+      "handler": "newsletter.findByStatus",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletters/type/:type",
+      "handler": "newsletter.findByType",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletters/sent",
+      "handler": "newsletter.getSentCampaigns",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletters/scheduled",
+      "handler": "newsletter.getScheduled",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletters/:id",
+      "handler": "newsletter.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/newsletters",
+      "handler": "newsletter.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/newsletters/:id",
+      "handler": "newsletter.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/newsletters/:id",
+      "handler": "newsletter.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

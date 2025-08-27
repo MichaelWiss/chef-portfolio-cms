@@ -1,0 +1,104 @@
+{
+  "kind": "collectionType",
+  "collectionName": "site_copies",
+  "info": {
+    "singularName": "site-copy",
+    "pluralName": "site-copies",
+    "displayName": "Site Copy",
+    "description": "Editable text content for all website sections"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "sectionName": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 100
+    },
+    "pageLocation": {
+      "type": "enumeration",
+      "enum": [
+        "homepage",
+        "about",
+        "gallery",
+        "recipes",
+        "contact",
+        "footer",
+        "navigation",
+        "global"
+      ],
+      "required": true
+    },
+    "contentType": {
+      "type": "enumeration",
+      "enum": [
+        "headline",
+        "subheading", 
+        "body-text",
+        "button-text",
+        "form-label",
+        "meta-description",
+        "call-to-action",
+        "testimonial",
+        "quote"
+      ],
+      "required": true
+    },
+    "content": {
+      "type": "richtext",
+      "required": true
+    },
+    "alternativeText": {
+      "type": "text"
+    },
+    "displayOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "targetAudience": {
+      "type": "enumeration",
+      "enum": [
+        "general",
+        "press",
+        "clients", 
+        "restaurants",
+        "food-enthusiasts"
+      ],
+      "default": "general"
+    },
+    "characterLimit": {
+      "type": "integer"
+    },
+    "seoFriendly": {
+      "type": "boolean",
+      "default": false
+    },
+    "lastUpdated": {
+      "type": "datetime"
+    },
+    "editorNotes": {
+      "type": "text"
+    },
+    "seasonalContent": {
+      "type": "boolean",
+      "default": false
+    },
+    "expirationDate": {
+      "type": "date"
+    },
+    "language": {
+      "type": "string",
+      "default": "en"
+    },
+    "associatedContent": {
+      "type": "string"
+    }
+  }
+}

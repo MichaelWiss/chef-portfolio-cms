@@ -1,0 +1,122 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dish_showcases",
+  "info": {
+    "singularName": "dish-showcase",
+    "pluralName": "dish-showcases",
+    "displayName": "Dish Showcase",
+    "description": "Showcase of culinary creations with detailed photography and descriptions"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100,
+      "minLength": 3
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "additionalImages": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "description": {
+      "type": "richtext",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "appetizer",
+        "main-course",
+        "dessert",
+        "small-plates",
+        "seasonal-special",
+        "signature-dish"
+      ],
+      "required": true
+    },
+    "techniqueTags": {
+      "type": "json"
+    },
+    "ingredients": {
+      "type": "richtext"
+    },
+    "cookingMethod": {
+      "type": "text"
+    },
+    "season": {
+      "type": "enumeration",
+      "enum": [
+        "spring",
+        "summer",
+        "fall",
+        "winter",
+        "year-round"
+      ]
+    },
+    "restaurantVenue": {
+      "type": "string"
+    },
+    "chefNotes": {
+      "type": "text"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "difficulty": {
+      "type": "enumeration",
+      "enum": [
+        "simple",
+        "moderate",
+        "complex",
+        "professional"
+      ]
+    },
+    "prepTime": {
+      "type": "integer"
+    },
+    "cookTime": {
+      "type": "integer"
+    },
+    "servings": {
+      "type": "integer"
+    },
+    "allergens": {
+      "type": "json"
+    },
+    "nutritionalHighlights": {
+      "type": "text"
+    },
+    "wineParking": {
+      "type": "text"
+    },
+    "story": {
+      "type": "richtext"
+    },
+    "seoTitle": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "seoDescription": {
+      "type": "text",
+      "maxLength": 160
+    }
+  }
+}
