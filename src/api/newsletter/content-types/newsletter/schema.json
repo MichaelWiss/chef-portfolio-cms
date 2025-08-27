@@ -1,0 +1,178 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsletters",
+  "info": {
+    "singularName": "newsletter",
+    "pluralName": "newsletters",
+    "displayName": "Newsletter",
+    "description": "Email newsletter management and campaign creation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "campaignName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "subjectLine": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "previewText": {
+      "type": "string",
+      "maxLength": 150
+    },
+    "contentType": {
+      "type": "enumeration",
+      "enum": [
+        "new-menu",
+        "event-announcement",
+        "recipe-feature",
+        "behind-the-scenes",
+        "seasonal-update",
+        "collaboration",
+        "press-announcement",
+        "general-update"
+      ],
+      "required": true
+    },
+    "emailContent": {
+      "type": "richtext",
+      "required": true
+    },
+    "featuredImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "additionalImages": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "featuredDish": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::dish-showcase.dish-showcase"
+    },
+    "callToAction": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "ctaUrl": {
+      "type": "string"
+    },
+    "ctaButtonText": {
+      "type": "string",
+      "maxLength": 30
+    },
+    "scheduledSendDate": {
+      "type": "datetime"
+    },
+    "actualSendDate": {
+      "type": "datetime"
+    },
+    "targetAudience": {
+      "type": "enumeration",
+      "enum": [
+        "all-subscribers",
+        "vip-diners",
+        "recipe-enthusiasts", 
+        "press-contacts",
+        "industry-professionals",
+        "event-attendees"
+      ],
+      "default": "all-subscribers"
+    },
+    "subscriberCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "openRate": {
+      "type": "decimal"
+    },
+    "clickRate": {
+      "type": "decimal"
+    },
+    "unsubscribeCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "campaignStatus": {
+      "type": "enumeration",
+      "enum": [
+        "draft",
+        "scheduled", 
+        "sending",
+        "sent",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "emailServiceProvider": {
+      "type": "enumeration",
+      "enum": [
+        "sendgrid",
+        "mailgun",
+        "mailchimp",
+        "convertkit",
+        "custom"
+      ],
+      "default": "sendgrid"
+    },
+    "externalCampaignId": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "text"
+    },
+    "tags": {
+      "type": "json"
+    },
+    "seasonalCampaign": {
+      "type": "boolean",
+      "default": false
+    },
+    "recurring": {
+      "type": "boolean",
+      "default": false
+    },
+    "recurringFrequency": {
+      "type": "enumeration",
+      "enum": [
+        "weekly",
+        "monthly",
+        "quarterly",
+        "seasonal"
+      ]
+    },
+    "testEmailSent": {
+      "type": "boolean",
+      "default": false
+    },
+    "testEmailRecipients": {
+      "type": "json"
+    },
+    "personalMessage": {
+      "type": "text"
+    },
+    "signature": {
+      "type": "richtext"
+    },
+    "socialMediaLinks": {
+      "type": "json"
+    },
+    "unsubscribeText": {
+      "type": "text"
+    },
+    "templateUsed": {
+      "type": "string"
+    }
+  }
+}

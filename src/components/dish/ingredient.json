@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_dish_ingredients",
+  "info": {
+    "displayName": "Ingredient",
+    "description": "Individual ingredient with quantity and source information"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "quantity": {
+      "type": "string"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "substitutions": {
+      "type": "text"
+    },
+    "preparation": {
+      "type": "string"
+    },
+    "optional": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

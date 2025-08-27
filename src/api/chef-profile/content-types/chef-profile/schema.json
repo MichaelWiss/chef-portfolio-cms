@@ -1,0 +1,132 @@
+{
+  "kind": "singleType",
+  "collectionName": "chef_profiles",
+  "info": {
+    "singularName": "chef-profile",
+    "pluralName": "chef-profiles",
+    "displayName": "Chef Profile",
+    "description": "Main chef information, biography, and professional details"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fullName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "profileImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "actionPhotos": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "shortBio": {
+      "type": "text",
+      "required": true,
+      "maxLength": 300
+    },
+    "fullBiography": {
+      "type": "richtext",
+      "required": true
+    },
+    "culinaryPhilosophy": {
+      "type": "richtext",
+      "required": true
+    },
+    "signatureStyle": {
+      "type": "text"
+    },
+    "currentPosition": {
+      "type": "string"
+    },
+    "currentRestaurant": {
+      "type": "string"
+    },
+    "yearsExperience": {
+      "type": "integer"
+    },
+    "culinaryEducation": {
+      "type": "richtext"
+    },
+    "previousPositions": {
+      "type": "richtext"
+    },
+    "mentorsInfluences": {
+      "type": "richtext"
+    },
+    "specialties": {
+      "type": "json"
+    },
+    "awards": {
+      "type": "richtext"
+    },
+    "certifications": {
+      "type": "richtext"
+    },
+    "contactEmail": {
+      "type": "email",
+      "required": true
+    },
+    "phoneNumber": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "websiteUrl": {
+      "type": "string"
+    },
+    "socialMedia": {
+      "type": "json"
+    },
+    "bookingInquiries": {
+      "type": "richtext"
+    },
+    "mediaInquiries": {
+      "type": "richtext"
+    },
+    "collaborationInfo": {
+      "type": "richtext"
+    },
+    "privateDiningInfo": {
+      "type": "richtext"
+    },
+    "consultingServices": {
+      "type": "richtext"
+    },
+    "pressKit": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["files", "images"]
+    },
+    "resume": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"]
+    },
+    "seoTitle": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "seoDescription": {
+      "type": "text",
+      "maxLength": 160
+    }
+  }
+}

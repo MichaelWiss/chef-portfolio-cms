@@ -1,0 +1,84 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/newsletter-subscribers",
+      "handler": "newsletter-subscriber.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletter-subscribers/active",
+      "handler": "newsletter-subscriber.getActive",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletter-subscribers/vip",
+      "handler": "newsletter-subscriber.getVip",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletter-subscribers/preference/:preference",
+      "handler": "newsletter-subscriber.getByPreference",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/newsletter-subscribers/:id",
+      "handler": "newsletter-subscriber.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/newsletter-subscribers",
+      "handler": "newsletter-subscriber.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/newsletter-subscribers/subscribe",
+      "handler": "newsletter-subscriber.subscribe",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/newsletter-subscribers/unsubscribe",
+      "handler": "newsletter-subscriber.unsubscribe",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/newsletter-subscribers/:id",
+      "handler": "newsletter-subscriber.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/newsletter-subscribers/:id",
+      "handler": "newsletter-subscriber.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
