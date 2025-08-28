@@ -148,14 +148,14 @@ Interactive features, booking system, and professional integrations
   - [x] Component showcase page at `/design-system`
   - [x] Professional design philosophy documentation
 
-#### Advanced Culinary Features
-- [ ] Implement seasonal content organization and filtering
-- [ ] Add recipe scaling calculator (serving size adjustments)
-- [ ] Create wine/beverage pairing suggestions system
-- [ ] Implement cooking technique video integration
-- [ ] Set up before/after image sliders for ingredient transformations
-- [ ] Add chef's notes and personal story integration
-- [ ] Create menu timeline showing seasonal evolution
+
+#### Third-party Integrations
+- [ ] Email service integration (MailerLite/SendGrid/Mailgun) for newsletters
+- [ ] Newsletter platform API integration for subscriber management
+- [ ] Google Analytics 4 setup with newsletter conversion tracking
+- [ ] Social media API integrations with newsletter signup promotion
+- [ ] Contact form integration with newsletter subscription options
+- [ ] Email template testing and delivery monitoring
 
 #### User Experience
 - [ ] Add professional inquiry contact form for private dining/consulting
@@ -178,9 +178,9 @@ Interactive features, booking system, and professional integrations
 
 ---
 
-## Phase 2: Enhancement (Medium-term - 4-6 weeks)
+## Phase 2: Enhancement (Medium-term - 3-4 weeks)
 
-### Month 2: Advanced Features & Polish
+### Week 4-5: Enhanced Culinary Content Management
 
 #### Enhanced Culinary Content Management
 - [ ] Press & Media content type for reviews and interviews
@@ -219,7 +219,7 @@ Interactive features, booking system, and professional integrations
 - [ ] Progressive Web App features for offline recipe access
 - [ ] Advanced image lazy loading for large photo galleries
 
-### Month 2.5: Optimization & Integration
+### Week 6: Optimization & Integration
 
 #### Performance Optimization
 - [ ] Image optimization and WebP conversion
@@ -229,13 +229,6 @@ Interactive features, booking system, and professional integrations
 - [ ] Core Web Vitals optimization
 - [ ] CDN integration setup
 
-#### Third-party Integrations
-- [ ] Email service integration (SendGrid/Mailgun) for newsletters
-- [ ] Newsletter platform API integration for subscriber management
-- [ ] Google Analytics 4 setup with newsletter conversion tracking
-- [ ] Social media API integrations with newsletter signup promotion
-- [ ] Contact form integration with newsletter subscription options
-- [ ] Email template testing and delivery monitoring
 
 #### SEO & Analytics
 - [ ] Advanced SEO optimization
@@ -247,9 +240,9 @@ Interactive features, booking system, and professional integrations
 
 ---
 
-## Phase 3: Growth (Long-term - 3-6 months)
+## Phase 3: Growth (Long-term - 2-4 months)
 
-### Months 3-4: Advanced Features & Scaling
+### Months 2-3: Advanced Features & Scaling
 
 #### Advanced CMS Features
 - [ ] Multi-language support for international audience (i18n)
@@ -275,7 +268,7 @@ Interactive features, booking system, and professional integrations
 - [ ] Custom page templates
 - [ ] Widget/component system
 
-### Months 4-5: Enterprise Features
+### Months 3-4: Enterprise Features
 
 #### Scalability & Performance
 - [ ] Database optimization and indexing
@@ -301,7 +294,7 @@ Interactive features, booking system, and professional integrations
 - [ ] Social media auto-posting with newsletter content
 - [ ] Advanced analytics integrations for marketing insights
 
-### Month 6: Production & Maintenance
+### Month 5: Production & Maintenance
 
 #### Production Deployment
 - [ ] Production server setup and configuration
@@ -412,3 +405,21 @@ Interactive features, booking system, and professional integrations
 - [ ] Clear migration path for scaling beyond free tiers
 
 This roadmap provides a clear path from MVP to a fully-featured, scalable CMS while maintaining focus on the free hosting constraint and elegant design principles.
+
+---
+
+## Phase 4: Advanced Culinary Features (Low Priority - Future Development)
+
+### Advanced Culinary Features
+- [ ] Implement seasonal content organization and filtering
+- [ ] Add recipe scaling calculator (serving size adjustments)
+- [ ] Create wine/beverage pairing suggestions system
+- [ ] Implement cooking technique video integration
+- [ ] Set up before/after image sliders for ingredient transformations
+- [ ] Add chef's notes and personal story integration
+- [ ] Create menu timeline showing seasonal evolution
+- [ ] Advanced wine pairing database with sommelier recommendations
+- [ ] Interactive cooking technique tutorials with video integration
+- [ ] Seasonal ingredient availability tracking and suggestions
+- [ ] Advanced recipe difficulty algorithms based on technique complexity
+- [ ] Chef's personal cooking philosophy and methodology documentation
