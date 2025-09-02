@@ -722,6 +722,115 @@ export interface ApiNewsletterNewsletter extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPrivateDiningInquiryPrivateDiningInquiry
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'private_dining_inquiries';
+  info: {
+    description: 'Contact form submissions for private dining and consultation requests';
+    displayName: 'Private Dining Inquiry';
+    pluralName: 'private-dining-inquiries';
+    singularName: 'private-dining-inquiry';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    budget: Schema.Attribute.Enumeration<
+      [
+        'budget-under-5k',
+        'budget-5k-to-15k',
+        'budget-15k-to-30k',
+        'budget-30k-to-50k',
+        'budget-over-50k',
+        'budget-undisclosed',
+      ]
+    > &
+      Schema.Attribute.DefaultTo<'budget-undisclosed'>;
+    company: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    eventDate: Schema.Attribute.Date;
+    eventType: Schema.Attribute.Enumeration<
+      [
+        'private-dining',
+        'corporate-event',
+        'wedding',
+        'consulting',
+        'birthday-celebration',
+        'anniversary',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'private-dining'>;
+    firstName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+        minLength: 2;
+      }>;
+    guestCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 500;
+          min: 1;
+        },
+        number
+      >;
+    lastName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+        minLength: 2;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::private-dining-inquiry.private-dining-inquiry'
+    > &
+      Schema.Attribute.Private;
+    location: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    message: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+        minLength: 10;
+      }>;
+    notes: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20;
+      }>;
+    preferredContact: Schema.Attribute.Enumeration<
+      ['email', 'phone', 'either']
+    > &
+      Schema.Attribute.DefaultTo<'email'>;
+    publishedAt: Schema.Attribute.DateTime;
+    status: Schema.Attribute.Enumeration<
+      ['new', 'contacted', 'confirmed', 'completed', 'cancelled']
+    > &
+      Schema.Attribute.DefaultTo<'new'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSiteCopySiteCopy extends Struct.CollectionTypeSchema {
   collectionName: 'site_copies';
   info: {
@@ -1313,6 +1422,7 @@ declare module '@strapi/strapi' {
       'api::dish-showcase.dish-showcase': ApiDishShowcaseDishShowcase;
       'api::newsletter-subscriber.newsletter-subscriber': ApiNewsletterSubscriberNewsletterSubscriber;
       'api::newsletter.newsletter': ApiNewsletterNewsletter;
+      'api::private-dining-inquiry.private-dining-inquiry': ApiPrivateDiningInquiryPrivateDiningInquiry;
       'api::site-copy.site-copy': ApiSiteCopySiteCopy;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

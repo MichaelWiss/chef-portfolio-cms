@@ -184,6 +184,29 @@ export const strapiService = {
     return response.data;
   },
 
+  // Private Dining Inquiry
+  submitPrivateDiningInquiry: async (
+    inquiryData: PrivateDiningInquiry
+  ): Promise<StrapiResponse<PrivateDiningInquiryResponse>> => {
+    try {
+      const response = await strapiApi.post('/private-dining-inquiries', {
+        data: inquiryData,
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        // Server responded with error status
+        throw new Error(error.response.data.error?.message || 'Failed to submit inquiry');
+      } else if (error.request) {
+        // Request was made but no response received
+        throw new Error('Network error - please check your connection');
+      } else {
+        // Something else happened
+        throw new Error('An unexpected error occurred');
+      }
+    }
+  },
+
   // Utility function to get full image URL
   getStrapiImageUrl: (image: StrapiImage | undefined): string => {
     if (!image) return '/placeholder-image.jpg';
@@ -210,3 +233,62 @@ export const strapiService = {
 };
 
 export default strapiService;
+
+// private dining inquiry
+export interface PrivateDiningInquiry {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  eventType: 'private-dining' | 'corporate-event' | 'wedding' | 'consulting' | 'other';
+  eventDate?: string; // ISO date string
+  guestCount?: number;
+  budget?: 'budget-under-5k' | 'budget-5k-to-15k' | 'budget-15k-to-30k' | 'budget-30k-to-50k' | 'budget-over-50k' | 'budget-undisclosed';
+  location?: string;
+  message: string;
+  preferredContact?: 'email' | 'phone' | 'either';
+  status?: 'new' | 'contacted' | 'confirmed' | 'completed' | 'cancelled';
+}
+
+export interface PrivateDiningInquiryResponse {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  eventType: string;
+  eventDate?: string;
+  guestCount?: number;
+  budget?: string;
+  location?: string;
+  message: string;
+  preferredContact: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+submitPrivateDiningInquiry: async (
+  inquiryData: PrivateDiningInquiry
+): Promise<StrapiResponse<PrivateDiningInquiryResponse>> => {
+  try {
+    const response = await strapiApi.post('/private-dining-inquiries', {
+      data: inquiryData,
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      // Server responded with error status
+      throw new Error(error.response.data.error?.message || 'Failed to submit inquiry');
+    } else if (error.request) {
+      // Request was made but no response received
+      throw new Error('Network error - please check your connection');
+    } else {
+      // Something else happened
+      throw new Error('An unexpected error occurred');
+    }
+  }
+}

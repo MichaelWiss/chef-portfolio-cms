@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import ConsultationModal from '@/components/ConsultationModal';
 
 // Client-only newsletter form to avoid hydration issues
 function ClientNewsletterForm() {
@@ -73,7 +74,7 @@ function ClientNewsletterForm() {
 }
 
 // Modern Navigation Component
-const ModernNavigation = () => {
+const ModernNavigation = ({ onBookConsultation }: { onBookConsultation: () => void }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -110,7 +111,7 @@ const ModernNavigation = () => {
             <Link href="#about" className="nav-link">About</Link>
             <Link href="#portfolio" className="nav-link">Portfolio</Link>
             <Link href="#contact" className="nav-link">Contact</Link>
-            <button className="btn-primary btn-sm">Book Consultation</button>
+            <button className="btn-primary btn-sm" onClick={onBookConsultation}>Book Consultation</button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -136,7 +137,7 @@ const ModernNavigation = () => {
               <Link href="#about" className="nav-link py-2">About</Link>
               <Link href="#portfolio" className="nav-link py-2">Portfolio</Link>
               <Link href="#contact" className="nav-link py-2">Contact</Link>
-              <button className="btn-primary mt-4">Book Consultation</button>
+              <button className="btn-primary mt-4" onClick={onBookConsultation}>Book Consultation</button>
             </div>
           </div>
         )}
@@ -490,14 +491,29 @@ const Footer = () => {
 
 // Main Page Component
 export default function Page() {
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+
+  const handleBookConsultation = () => {
+    setIsConsultationModalOpen(true);
+  };
+
+  const handleCloseConsultationModal = () => {
+    setIsConsultationModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen font-sans" style={{ color: '#1c1917' }}>
-      <ModernNavigation />
+      <ModernNavigation onBookConsultation={handleBookConsultation} />
       <HeroSection />
       <AboutSection />
       <PortfolioSection />
       <NewsletterSection />
       <Footer />
+
+      <ConsultationModal
+        isOpen={isConsultationModalOpen}
+        onClose={handleCloseConsultationModal}
+      />
     </div>
   );
 }

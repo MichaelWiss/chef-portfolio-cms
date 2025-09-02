@@ -1,0 +1,114 @@
+{
+  "kind": "collectionType",
+  "collectionName": "private_dining_inquiries",
+  "info": {
+    "singularName": "private-dining-inquiry",
+    "pluralName": "private-dining-inquiries",
+    "displayName": "Private Dining Inquiry",
+    "description": "Contact form submissions for private dining and consultation requests"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "firstName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 50,
+      "minLength": 2
+    },
+    "lastName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 50,
+      "minLength": 2
+    },
+    "email": {
+      "type": "email",
+      "required": true,
+      "maxLength": 100
+    },
+    "phone": {
+      "type": "string",
+      "required": false,
+      "maxLength": 20
+    },
+    "company": {
+      "type": "string",
+      "required": false,
+      "maxLength": 100
+    },
+    "eventType": {
+      "type": "enumeration",
+      "enum": [
+        "private-dining",
+        "corporate-event",
+        "wedding",
+        "consulting",
+        "birthday-celebration",
+        "anniversary",
+        "other"
+      ],
+      "required": true,
+      "default": "private-dining"
+    },
+    "eventDate": {
+      "type": "date",
+      "required": false
+    },
+    "guestCount": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "max": 500
+    },
+    "budget": {
+      "type": "enumeration",
+      "enum": [
+        "budget-under-5k",
+        "budget-5k-to-15k",
+        "budget-15k-to-30k",
+        "budget-30k-to-50k",
+        "budget-over-50k",
+        "budget-undisclosed"
+      ],
+      "required": false,
+      "default": "budget-undisclosed"
+    },
+    "location": {
+      "type": "string",
+      "required": false,
+      "maxLength": 200
+    },
+    "message": {
+      "type": "text",
+      "required": true,
+      "maxLength": 1000,
+      "minLength": 10
+    },
+    "preferredContact": {
+      "type": "enumeration",
+      "enum": ["email", "phone", "either"],
+      "default": "email",
+      "required": false
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "new",
+        "contacted",
+        "confirmed",
+        "completed",
+        "cancelled"
+      ],
+      "default": "new",
+      "required": false
+    },
+    "notes": {
+      "type": "text",
+      "required": false,
+      "maxLength": 500
+    }
+  }
+}

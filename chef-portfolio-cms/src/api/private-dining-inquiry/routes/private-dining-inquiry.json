@@ -1,0 +1,44 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/private-dining-inquiries",
+      "handler": "private-dining-inquiry.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/private-dining-inquiries/:id",
+      "handler": "private-dining-inquiry.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/private-dining-inquiries",
+      "handler": "private-dining-inquiry.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/private-dining-inquiries/:id",
+      "handler": "private-dining-inquiry.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/private-dining-inquiries/:id",
+      "handler": "private-dining-inquiry.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
