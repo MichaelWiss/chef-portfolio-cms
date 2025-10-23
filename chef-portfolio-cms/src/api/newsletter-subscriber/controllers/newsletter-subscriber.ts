@@ -3,6 +3,7 @@
  */
 
 import { factories } from '@strapi/strapi'
+import mailerliteService from '../../../services/mailerlite';
 
 export default factories.createCoreController('api::newsletter-subscriber.newsletter-subscriber', ({ strapi }) => ({
   // Subscribe a new email
@@ -34,6 +35,34 @@ export default factories.createCoreController('api::newsletter-subscriber.newsle
         }
       });
 
+      // Sync to MailerLite in background
+      try {
+        await mailerliteService.addSubscriber({
+          email,
+          firstName,
+          lastName,
+          preferences,
+          customFields: {
+            strapi_id: subscriber.id,
+            subscription_source: source || 'website'
+          }
+        });
+        
+        // Update subscriber with MailerLite sync status
+        await strapi.entityService.update('api::newsletter-subscriber.newsletter-subscriber', subscriber.id, {
+          data: {
+            externalId: email, // MailerLite uses email as ID
+            customFields: {
+              ...((subscriber.customFields as Record<string, any>) || {}),
+              mailerlite_synced: true,
+              mailerlite_sync_date: new Date().toISOString()
+            }
+          }
+        });
+      } catch (mailerliteError) {
+        strapi.log.warn('Failed to sync to MailerLite, but subscriber created in Strapi:', mailerliteError);
+      }
+
       return subscriber;
     } catch (err) {
       ctx.throw(500, err);
@@ -61,7 +90,27 @@ export default factories.createCoreController('api::newsletter-subscriber.newsle
         }
       });
 
+      // Sync unsubscribe to MailerLite
+      try {
+        await mailerliteService.unsubscribeSubscriber(email);
+      } catch (mailerliteError) {
+        strapi.log.warn('Failed to sync unsubscribe to MailerLite:', mailerliteError);
+      }
+
       return { message: 'Successfully unsubscribed' };
+    } catch (err) {
+      ctx.throw(500, err);
+    }
+  },
+
+  // Sync all subscribers to MailerLite
+  async syncToMailerLite(ctx) {
+    try {
+      const results = await mailerliteService.syncAllSubscribers();
+      return {
+        message: 'Sync completed',
+        results
+      };
     } catch (err) {
       ctx.throw(500, err);
     }

@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "projects": [
+    {
+      "name": "chef-portfolio-frontend",
+      "source": "chef-portfolio-frontend",
+      "framework": "nextjs"
+    },
+    {
+      "name": "chef-portfolio-cms",
+      "source": "chef-portfolio-cms"
+    }
+  ]
+}
