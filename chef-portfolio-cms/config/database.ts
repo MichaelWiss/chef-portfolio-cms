@@ -5,6 +5,7 @@ export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
   const rawCa = env('DATABASE_SSL_CA');
   const base64Ca = env('DATABASE_SSL_CA_BASE64');
+  // Render deploys store large certs as base64; decode when provided.
   const sslCa = base64Ca ? Buffer.from(base64Ca, 'base64').toString('utf8') : rawCa;
 
   const connections = {
