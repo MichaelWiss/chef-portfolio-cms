@@ -24,11 +24,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_STRAPI_BASE_URL: process.env.NEXT_PUBLIC_STRAPI_BASE_URL,
   },
   
-  // Performance optimizations
-  experimental: {
-    optimizeCss: true,
-  },
-  
   // Output configuration for Vercel
   output: 'standalone',
 };

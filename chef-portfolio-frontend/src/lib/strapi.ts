@@ -184,29 +184,6 @@ export const strapiService = {
     return response.data;
   },
 
-  // Private Dining Inquiry
-  submitPrivateDiningInquiry: async (
-    inquiryData: PrivateDiningInquiry
-  ): Promise<StrapiResponse<PrivateDiningInquiryResponse>> => {
-    try {
-      const response = await strapiApi.post('/private-dining-inquiries', {
-        data: inquiryData,
-      });
-      return response.data;
-    } catch (error: any) {
-      if (error.response) {
-        // Server responded with error status
-        throw new Error(error.response.data.error?.message || 'Failed to submit inquiry');
-      } else if (error.request) {
-        // Request was made but no response received
-        throw new Error('Network error - please check your connection');
-      } else {
-        // Something else happened
-        throw new Error('An unexpected error occurred');
-      }
-    }
-  },
-
   // Utility function to get full image URL
   getStrapiImageUrl: (image: StrapiImage | undefined): string => {
     if (!image) return '/placeholder-image.jpg';
@@ -229,6 +206,27 @@ export const strapiService = {
       medium: image.formats?.medium ? getFullUrl(image.formats.medium.url) : getFullUrl(image.url),
       large: image.formats?.large ? getFullUrl(image.formats.large.url) : getFullUrl(image.url),
     };
+  },
+
+  // Submit private dining inquiry
+  submitPrivateDiningInquiry: async (
+    inquiryData: PrivateDiningInquiry
+  ): Promise<StrapiResponse<PrivateDiningInquiryResponse>> => {
+    try {
+      const response = await strapiApi.post('/private-dining-inquiries', {
+        data: inquiryData,
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { error?: { message?: string } } }; request?: unknown; message?: string };
+      if (axiosError.response) {
+        throw new Error(axiosError.response?.data?.error?.message || 'Failed to submit inquiry');
+      } else if (axiosError.request) {
+        throw new Error('Network error - please check your connection');
+      } else {
+        throw new Error('An unexpected error occurred');
+      }
+    }
   }
 };
 
@@ -268,27 +266,4 @@ export interface PrivateDiningInquiryResponse {
   status: string;
   createdAt: string;
   updatedAt: string;
-}
-
-
-submitPrivateDiningInquiry: async (
-  inquiryData: PrivateDiningInquiry
-): Promise<StrapiResponse<PrivateDiningInquiryResponse>> => {
-  try {
-    const response = await strapiApi.post('/private-dining-inquiries', {
-      data: inquiryData,
-    });
-    return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      // Server responded with error status
-      throw new Error(error.response.data.error?.message || 'Failed to submit inquiry');
-    } else if (error.request) {
-      // Request was made but no response received
-      throw new Error('Network error - please check your connection');
-    } else {
-      // Something else happened
-      throw new Error('An unexpected error occurred');
-    }
-  }
 }

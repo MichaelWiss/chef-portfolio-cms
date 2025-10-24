@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { strapiService } from '@/lib/strapi';
-import { CheckIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon } from '@heroicons/react/24/outline';
 
 type PrivateDiningInquiry = {
   firstName: string;
@@ -103,7 +103,7 @@ export default function PrivateDiningInquiry({ onSuccess }: PrivateDiningEnquiry
     return (
       <div className="bg-stone-50 rounded-lg p-8 text-center">
         <div className="flex justify-center mb-4">
-          <CheckIcon className="h-12 w-12 text-emerald-600" />
+          <CheckCircleIcon className="h-12 w-12 text-emerald-600" />
         </div>
         <h3 className="text-xl font-semibold text-stone-900 mb-2">
           Thank You for Your Inquiry!

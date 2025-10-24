@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import PrivateDiningEnquiry from './PrivateDiningEnquiry';
@@ -60,7 +60,7 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                 <div className="p-6">
                   <div className="mb-6">
                     <p className="text-stone-600 leading-relaxed">
-                      Ready to create an unforgettable culinary experience? Let's discuss your vision and bring it to life.
+                      Ready to create an unforgettable culinary experience? Let&apos;s discuss your vision and bring it to life.
                     </p>
                   </div>
 
