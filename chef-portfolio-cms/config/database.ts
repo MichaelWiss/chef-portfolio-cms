@@ -6,6 +6,7 @@ export default ({ env }) => {
   const rawCa = env('DATABASE_SSL_CA');
   const base64Ca = env('DATABASE_SSL_CA_BASE64');
   // Render deploys store large certs as base64; decode when provided.
+  //database.ts refuses to work without this change
   const sslCa = base64Ca ? Buffer.from(base64Ca, 'base64').toString('utf8') : rawCa;
 
   const connections = {
