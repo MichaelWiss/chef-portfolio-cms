@@ -5,9 +5,27 @@ export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
   const rawCa = env('DATABASE_SSL_CA');
   const base64Ca = env('DATABASE_SSL_CA_BASE64');
-  // Render deploys store large certs as base64; decode when provided.
-  //database.ts refuses to work without this change
-  const sslCa = base64Ca ? Buffer.from(base64Ca, 'base64').toString('utf8') : rawCa;
+  // Normalize and decode base64 CA (strip quotes/whitespace if pasted with quotes)
+  const normalizedBase64 = base64Ca ? base64Ca.trim().replace(/^"|"$/g, '').replace(/\s+/g, '') : null;
+  const sslCa = normalizedBase64 ? Buffer.from(normalizedBase64, 'base64').toString('utf8') : rawCa;
+
+  // If DATABASE_URL is provided, parse it to avoid sslmode=require overriding our SSL options
+  const parsePgUrl = (urlStr?: string) => {
+    if (!urlStr) return null as any;
+    try {
+      const u = new URL(urlStr);
+      return {
+        host: u.hostname,
+        port: u.port ? parseInt(u.port, 10) : 5432,
+        database: u.pathname ? u.pathname.replace(/^\//, '') : undefined,
+        user: decodeURIComponent(u.username || ''),
+        password: decodeURIComponent(u.password || ''),
+      };
+    } catch {
+      return null as any;
+    }
+  };
+  const parsedPg = parsePgUrl(env('DATABASE_URL'));
 
   const connections = {
     mysql: {
@@ -30,12 +48,12 @@ export default ({ env }) => {
     },
     postgres: {
       connection: {
-        connectionString: env('DATABASE_URL'),
-        host: env('DATABASE_HOST', 'localhost'),
-        port: env.int('DATABASE_PORT', 5432),
-        database: env('DATABASE_NAME', 'strapi'),
-        user: env('DATABASE_USERNAME', 'strapi'),
-        password: env('DATABASE_PASSWORD', 'strapi'),
+        // Use parsed URL pieces when available to ensure our SSL object is respected
+        host: parsedPg?.host || env('DATABASE_HOST', 'localhost'),
+        port: parsedPg?.port || env.int('DATABASE_PORT', 5432),
+        database: parsedPg?.database || env('DATABASE_NAME', 'strapi'),
+        user: parsedPg?.user || env('DATABASE_USERNAME', 'strapi'),
+        password: parsedPg?.password || env('DATABASE_PASSWORD', 'strapi'),
         ssl: env.bool('DATABASE_SSL', true) && {
           key: env('DATABASE_SSL_KEY', undefined),
           cert: env('DATABASE_SSL_CERT', undefined),
