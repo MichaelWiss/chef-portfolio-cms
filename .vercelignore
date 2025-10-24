@@ -90,6 +90,10 @@ exports/
 *.log
 .DS_Store
 
+# Admin example files (causing import errors)
+**/admin/app.example.tsx
+**/admin/vite.config.example.ts
+
 # Database
 database/*
 !database/.gitkeep
@@ -108,3 +112,6 @@ Thumbs.db
 
 # Vercel
 .vercel
+
+# Exclude frontend when deploying CMS only
+chef-portfolio-frontend/

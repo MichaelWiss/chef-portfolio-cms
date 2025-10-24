@@ -1,4 +1,4 @@
-import MailerLite from '@mailerlite/mailerlite-nodejs';
+// import MailerLite from '@mailerlite/mailerlite-nodejs';
 
 class MailerLiteService {
   private client: any;
@@ -10,7 +10,14 @@ class MailerLiteService {
       return;
     }
     
-    this.client = new MailerLite({ api_key: apiKey });
+    try {
+      // Dynamically import MailerLite to avoid build errors when package isn't installed
+      const MailerLite = require('@mailerlite/mailerlite-nodejs');
+      this.client = new MailerLite({ api_key: apiKey });
+    } catch (error) {
+      console.warn('MailerLite package not installed - newsletter sync disabled');
+      this.client = null;
+    }
   }
 
   /**
