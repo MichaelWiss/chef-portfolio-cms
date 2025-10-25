@@ -151,6 +151,17 @@ export default ({ env }) => {
       );
     }
     resolvedPort = poolerPortEnv ? toInt(poolerPortEnv, 6543) : toInt(databaseUrl?.port, 6543);
+
+    const poolUserEnv = env('SUPABASE_POOLER_USER');
+    if (poolUserEnv) {
+      resolvedUser = poolUserEnv;
+    } else if (directProjectRef) {
+      resolvedUser = `postgres.${directProjectRef}`;
+    } else if (resolvedUser && !resolvedUser.includes('.')) {
+      console.warn(
+        '[database] Using Supabase pooler but DATABASE_USERNAME/DATABASE_URL still supplies plain "postgres". Set SUPABASE_POOLER_USER or SUPABASE_PROJECT_REF so username includes project identifier (e.g. postgres.<ref>).'
+      );
+    }
   } else if (directProjectRef) {
     resolvedHost = `db.${directProjectRef}.supabase.co`;
     resolvedPort = 5432;
