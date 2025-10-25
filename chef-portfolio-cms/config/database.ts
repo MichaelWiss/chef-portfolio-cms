@@ -1,6 +1,7 @@
 import path from 'path';
 import { Buffer } from 'buffer';
 import dns from 'dns';
+import * as net from 'net';
 import { execFileSync } from 'child_process';
 
 try {
@@ -80,9 +81,14 @@ function parseUrl(value) {
   }
 }
 
-function trimLeadingSlash(value) {
-  return value ? value.replace(/^\\//, '') : value;
-}
+	function trimLeadingSlash(value) {
+	  if (!value) return value;
+	  let result = value;
+	  while (result.startsWith('/')) {
+	    result = result.slice(1);
+	  }
+	  return result;
+	}
 
 function extractProjectRefFromOptions(options) {
   if (!options) return null;
@@ -560,6 +566,69 @@ export default ({ env }) => {
   const resolvedUser = parsedPg?.user || env('DATABASE_USERNAME', 'strapi');
   const resolvedPassword = parsedPg?.password || env('DATABASE_PASSWORD', 'strapi');
 
+  if (
+    client === 'postgres' &&
+    forceIpv4Lookup &&
+    typeof resolvedHost === 'string' &&
+    net.isIP(resolvedHost) === 0
+  ) {
+    try {
+      const ipv4LookupScript = String.raw`
+const dns = require('dns').promises;
+dns.lookup(process.argv[2], { family: 4, all: false })
+  .then((result) => {
+    if (result && result.address) {
+      console.log(result.address);
+    } else {
+      console.error(JSON.stringify({ error: 'IPv4 address not found' }));
+      process.exit(1);
+    }
+  })
+  .catch((err) => {
+    console.error(JSON.stringify({ error: err && err.message }));
+    process.exit(1);
+  });
+`;
+      const lookupOutput = execFileSync(
+        process.execPath,
+        ['-e', ipv4LookupScript, resolvedHost],
+        { encoding: 'utf8' }
+      )
+        .trim()
+        .split(/\r?\n/)
+        .pop();
+      if (lookupOutput && /^[0-9.]+$/.test(lookupOutput)) {
+        resolvedHost = lookupOutput;
+        if (normalizedPgConnectionString) {
+          try {
+            const normalizedUrl = new URL(normalizedPgConnectionString);
+            normalizedUrl.hostname = resolvedHost;
+            normalizedPgConnectionString = normalizedUrl.toString();
+          } catch {
+            // ignore normalization errors
+          }
+        }
+      } else if (lookupOutput) {
+        try {
+          const parsed = JSON.parse(lookupOutput);
+          if (parsed?.error) {
+            console.warn(
+              `[database] IPv4 lookup warning for host ${resolvedHost}: ${parsed.error}`
+            );
+          }
+        } catch {
+          // ignore parsing issues
+        }
+      }
+    } catch (error) {
+      console.warn(
+        `[database] IPv4 lookup failed for host ${resolvedHost}: ${
+          (error as Error)?.message || 'unknown error'
+        }`
+      );
+    }
+  }
+
   if (!finalPgOptions) {
     const derived = getSupabaseProjectOption(resolvedHost);
     if (derived) {
@@ -658,8 +727,6 @@ export default ({ env }) => {
     },
     postgres: {
       connection: {
-        // Preserve the normalized connection string so pooled providers (e.g. Supabase) keep query params
-        ...(normalizedPgConnectionString ? { connectionString: normalizedPgConnectionString } : {}),
         host: resolvedHost,
         port: resolvedPort,
         database: resolvedDatabase,
