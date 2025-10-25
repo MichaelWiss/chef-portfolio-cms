@@ -35,32 +35,24 @@ export default ({ env }) => ({
     },
   },
   
-  // Email provider configuration (falls back to local nodemailer when no SendGrid API key is provided)
-  email: {
-    config: (() => {
-      const apiKey = env('SENDGRID_API_KEY');
-      if (apiKey) {
-        return {
+  // Email provider configuration
+  email: (() => {
+    const sendgridApiKey = env('SENDGRID_API_KEY');
+    if (sendgridApiKey) {
+      return {
+        config: {
           provider: 'sendgrid',
           providerOptions: {
-            apiKey,
+            apiKey: sendgridApiKey,
           },
           settings: {
             defaultFrom: env('EMAIL_DEFAULT_FROM', 'noreply@chef-portfolio.com'),
             defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO', 'chef@chef-portfolio.com'),
           },
-        };
-      }
-
-      // Default to Strapi's nodemailer provider (local transport) until a real provider is configured.
-      return {
-        provider: env('EMAIL_PROVIDER', 'nodemailer'),
-        providerOptions: {},
-        settings: {
-          defaultFrom: env('EMAIL_DEFAULT_FROM', 'noreply@chef-portfolio.com'),
-          defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO', 'chef@chef-portfolio.com'),
         },
       };
-    })(),
-  },
+    }
+
+    return { enabled: false };
+  })(),
 });
