@@ -14,18 +14,21 @@ export default ({ env }) => {
     if (!urlStr) return null as any;
     try {
       const u = new URL(urlStr);
+      const searchParams = Object.fromEntries(u.searchParams.entries());
       return {
         host: u.hostname,
         port: u.port ? parseInt(u.port, 10) : 5432,
         database: u.pathname ? u.pathname.replace(/^\//, '') : undefined,
         user: decodeURIComponent(u.username || ''),
         password: decodeURIComponent(u.password || ''),
+        options: searchParams.options,
       };
     } catch {
       return null as any;
     }
   };
   const parsedPg = parsePgUrl(env('DATABASE_URL'));
+  const pgOptions = parsedPg?.options || env('DATABASE_OPTIONS');
 
   const connections = {
     mysql: {
@@ -63,6 +66,7 @@ export default ({ env }) => {
           rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', false),
         },
         schema: env('DATABASE_SCHEMA', 'public'),
+        ...(pgOptions ? { options: pgOptions } : {}),
       },
       pool: { 
         min: env.int('DATABASE_POOL_MIN', 2), 
