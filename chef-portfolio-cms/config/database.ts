@@ -45,6 +45,7 @@ export default ({ env }) => {
   let finalPgOptions = databaseOptionsEnv || undefined;
   let finalPgOptionsSource: 'env' | 'hostname' | 'url' | undefined = databaseOptionsEnv ? 'env' : undefined;
   let finalPgSslMode = databaseSslModeEnv || undefined;
+  let connectionMode: 'standard' | 'pooler' | 'direct' = 'standard';
 
   if (databaseUrl) {
     try {
@@ -52,6 +53,12 @@ export default ({ env }) => {
       const existingOptions = url.searchParams.get('options') || undefined;
       const existingSslMode = url.searchParams.get('sslmode') || undefined;
       const supabaseOptionFromUrl = getSupabaseProjectOption(url.hostname);
+      const hostname = url.hostname.toLowerCase();
+      if (hostname.includes('.pooler.supabase.')) {
+        connectionMode = 'pooler';
+      } else if (hostname.includes('.supabase.')) {
+        connectionMode = 'direct';
+      }
 
       if (!finalPgOptions) {
         if (existingOptions) {
@@ -102,9 +109,51 @@ export default ({ env }) => {
     }
   }
 
-  const isSupabaseHost =
-    typeof resolvedHost === 'string' && resolvedHost.includes('.supabase.');
-  if (client === 'postgres' && isSupabaseHost && !finalPgOptions) {
+  const hostLower = typeof resolvedHost === 'string' ? resolvedHost.toLowerCase() : '';
+  let isSupabaseHost = hostLower.includes('.supabase.');
+  let isSupabasePoolerHost = hostLower.includes('.pooler.supabase.');
+
+  const useSupabasePooler = env.bool(
+    'SUPABASE_USE_POOLER',
+    isSupabasePoolerHost || connectionMode === 'pooler'
+  );
+
+  if (
+    client === 'postgres' &&
+    isSupabasePoolerHost &&
+    !useSupabasePooler &&
+    supabaseProjectRef
+  ) {
+    const directHost = `db.${supabaseProjectRef}.supabase.co`;
+    let directUrl: URL | null = null;
+    if (databaseUrl) {
+      try {
+        directUrl = new URL(databaseUrl);
+        directUrl.hostname = directHost;
+        directUrl.port = '5432';
+        directUrl.searchParams.delete('options');
+        if (finalPgSslMode) {
+          directUrl.searchParams.set('sslmode', finalPgSslMode);
+        }
+      } catch {
+        directUrl = null;
+      }
+    }
+    normalizedPgConnectionString =
+      directUrl?.toString() ||
+      `postgresql://${encodeURIComponent(resolvedUser)}:${encodeURIComponent(
+        resolvedPassword
+      )}@${directHost}:5432/${resolvedDatabase}`;
+    resolvedHost = directHost;
+    resolvedPort = 5432;
+    finalPgOptions = undefined;
+    finalPgOptionsSource = undefined;
+    isSupabaseHost = true;
+    isSupabasePoolerHost = false;
+    connectionMode = 'direct';
+  }
+
+  if (client === 'postgres' && isSupabaseHost && !finalPgOptions && useSupabasePooler) {
     console.warn(
       '[database] Supabase host detected but no project option provided. Set SUPABASE_PROJECT_REF or DATABASE_OPTIONS to avoid pooled connection errors.'
     );
@@ -122,6 +171,7 @@ export default ({ env }) => {
         typeof normalizedPgConnectionString === 'string'
           ? normalizedPgConnectionString.includes('options=')
           : false,
+      connectionMode,
     };
     console.info('[database] Resolved Postgres connection', connectionSummary);
   }
