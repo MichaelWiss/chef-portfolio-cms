@@ -95,8 +95,8 @@ export default ({ env }) => {
     }
   }
 
-  const resolvedHost = parsedPg?.host || env('DATABASE_HOST', 'localhost');
-  const resolvedPort = parsedPg?.port || env.int('DATABASE_PORT', 5432);
+  let resolvedHost = parsedPg?.host || env('DATABASE_HOST', 'localhost');
+  let resolvedPort = parsedPg?.port || env.int('DATABASE_PORT', 5432);
   const resolvedDatabase = parsedPg?.database || env('DATABASE_NAME', 'strapi');
   const resolvedUser = parsedPg?.user || env('DATABASE_USERNAME', 'strapi');
   const resolvedPassword = parsedPg?.password || env('DATABASE_PASSWORD', 'strapi');
