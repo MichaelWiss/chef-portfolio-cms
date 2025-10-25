@@ -18,6 +18,7 @@ export default ({ env }) => {
 
   const databaseUrl = env('DATABASE_URL', undefined) as string | undefined;
   const databaseOptionsEnv = env('DATABASE_OPTIONS', undefined) as string | undefined;
+  const databaseSslModeEnv = env('DATABASE_SSLMODE', undefined) as string | undefined;
 
   let parsedPg: {
     host: string;
@@ -28,11 +29,13 @@ export default ({ env }) => {
   } | null = null;
   let normalizedPgConnectionString = databaseUrl;
   let finalPgOptions = databaseOptionsEnv || undefined;
+  let finalPgSslMode = databaseSslModeEnv || undefined;
 
   if (databaseUrl) {
     try {
       const url = new URL(databaseUrl);
       const existingOptions = url.searchParams.get('options') || undefined;
+      const existingSslMode = url.searchParams.get('sslmode') || undefined;
       const supabaseOptionFromUrl = supabaseProjectOption(url.hostname) || undefined;
 
       if (!finalPgOptions) {
@@ -43,6 +46,12 @@ export default ({ env }) => {
         url.searchParams.set('options', finalPgOptions);
       } else if (existingOptions) {
         url.searchParams.delete('options');
+      }
+
+      if (finalPgSslMode) {
+        url.searchParams.set('sslmode', finalPgSslMode);
+      } else if (existingSslMode) {
+        url.searchParams.delete('sslmode');
       }
 
       normalizedPgConnectionString = url.toString();
