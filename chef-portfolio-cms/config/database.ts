@@ -10,6 +10,17 @@ try {
   // Ignore environments where DNS preference cannot be set (older Node versions)
 }
 
+const preferIpv4Lookup: typeof dns.lookup = (hostname, options, callback) => {
+  if (typeof options === 'function') {
+    return dns.lookup(hostname, { family: 4, all: false }, options);
+  }
+  const normalizedOptions =
+    typeof options === 'object' && options !== null
+      ? { ...options, family: 4, all: false }
+      : { family: 4, all: false };
+  return dns.lookup(hostname, normalizedOptions as dns.LookupOptions, callback as any);
+};
+
 export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
   const rawCa = env('DATABASE_SSL_CA');
@@ -18,6 +29,7 @@ export default ({ env }) => {
   const normalizedBase64 = base64Ca ? base64Ca.trim().replace(/^"|"$/g, '').replace(/\s+/g, '') : null;
   const sslCa = normalizedBase64 ? Buffer.from(normalizedBase64, 'base64').toString('utf8') : rawCa;
 
+  const forceIpv4Lookup = env.bool('DATABASE_FORCE_IPV4', true);
   const databaseProjectEnv = env('DATABASE_PROJECT', undefined) as string | undefined;
   const supabaseProjectRefEnv = env('SUPABASE_PROJECT_REF', databaseProjectEnv) as string | undefined;
   const supabaseProjectRef = supabaseProjectRefEnv ? supabaseProjectRefEnv.trim() : undefined;
@@ -181,6 +193,7 @@ export default ({ env }) => {
           ? normalizedPgConnectionString.includes('options=')
           : false,
       connectionMode,
+      forceIpv4Lookup,
     };
     console.info('[database] Resolved Postgres connection', connectionSummary);
   }
@@ -223,6 +236,7 @@ export default ({ env }) => {
         },
         schema: env('DATABASE_SCHEMA', 'public'),
         ...(finalPgOptions ? { options: finalPgOptions } : {}),
+        ...(forceIpv4Lookup ? { lookup: preferIpv4Lookup } : {}),
       },
       pool: { 
         min: env.int('DATABASE_POOL_MIN', 2), 
