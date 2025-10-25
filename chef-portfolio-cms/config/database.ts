@@ -1,5 +1,14 @@
 import path from 'path';
 import { Buffer } from 'buffer';
+import dns from 'dns';
+
+try {
+  if (typeof dns.setDefaultResultOrder === 'function') {
+    dns.setDefaultResultOrder('ipv4first');
+  }
+} catch {
+  // Ignore environments where DNS preference cannot be set (older Node versions)
+}
 
 export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
