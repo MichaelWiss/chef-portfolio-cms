@@ -9,32 +9,64 @@ export default ({ env }) => {
   const normalizedBase64 = base64Ca ? base64Ca.trim().replace(/^"|"$/g, '').replace(/\s+/g, '') : null;
   const sslCa = normalizedBase64 ? Buffer.from(normalizedBase64, 'base64').toString('utf8') : rawCa;
 
-  // If DATABASE_URL is provided, parse it to avoid sslmode=require overriding our SSL options
-  const parsePgUrl = (urlStr?: string) => {
-    if (!urlStr) return null as any;
-    try {
-      const u = new URL(urlStr);
-      const searchParams = Object.fromEntries(u.searchParams.entries());
-      return {
-        host: u.hostname,
-        port: u.port ? parseInt(u.port, 10) : 5432,
-        database: u.pathname ? u.pathname.replace(/^\//, '') : undefined,
-        user: decodeURIComponent(u.username || ''),
-        password: decodeURIComponent(u.password || ''),
-        options: searchParams.options,
-      };
-    } catch {
-      return null as any;
-    }
-  };
-  const parsedPg = parsePgUrl(env('DATABASE_URL'));
-  const supabaseOptions = () => {
-    const host = parsedPg?.host || env('DATABASE_HOST');
+  // Helper to derive Supabase project ref from pooled hostnames
+  const supabaseProjectOption = (host?: string | null) => {
     if (!host) return null;
     const match = host.match(/^db\.([^.]+)\.supabase\.co$/);
     return match ? `project=${match[1]}` : null;
   };
-  const pgOptions = parsedPg?.options || env('DATABASE_OPTIONS') || supabaseOptions();
+
+  const databaseUrl = env('DATABASE_URL', undefined) as string | undefined;
+  const databaseOptionsEnv = env('DATABASE_OPTIONS', undefined) as string | undefined;
+
+  let parsedPg: {
+    host: string;
+    port: number;
+    database?: string;
+    user: string;
+    password: string;
+  } | null = null;
+  let normalizedPgConnectionString = databaseUrl;
+  let finalPgOptions = databaseOptionsEnv || undefined;
+
+  if (databaseUrl) {
+    try {
+      const url = new URL(databaseUrl);
+      const existingOptions = url.searchParams.get('options') || undefined;
+      const supabaseOptionFromUrl = supabaseProjectOption(url.hostname) || undefined;
+
+      if (!finalPgOptions) {
+        finalPgOptions = existingOptions || supabaseOptionFromUrl;
+      }
+
+      if (finalPgOptions) {
+        url.searchParams.set('options', finalPgOptions);
+      } else if (existingOptions) {
+        url.searchParams.delete('options');
+      }
+
+      normalizedPgConnectionString = url.toString();
+      parsedPg = {
+        host: url.hostname,
+        port: url.port ? parseInt(url.port, 10) : 5432,
+        database: url.pathname ? url.pathname.replace(/^\//, '') : undefined,
+        user: decodeURIComponent(url.username || ''),
+        password: decodeURIComponent(url.password || ''),
+      };
+    } catch {
+      parsedPg = null;
+    }
+  }
+
+  const resolvedHost = parsedPg?.host || env('DATABASE_HOST', 'localhost');
+  const resolvedPort = parsedPg?.port || env.int('DATABASE_PORT', 5432);
+  const resolvedDatabase = parsedPg?.database || env('DATABASE_NAME', 'strapi');
+  const resolvedUser = parsedPg?.user || env('DATABASE_USERNAME', 'strapi');
+  const resolvedPassword = parsedPg?.password || env('DATABASE_PASSWORD', 'strapi');
+
+  if (!finalPgOptions) {
+    finalPgOptions = supabaseProjectOption(resolvedHost) || undefined;
+  }
 
   const connections = {
     mysql: {
@@ -57,12 +89,13 @@ export default ({ env }) => {
     },
     postgres: {
       connection: {
-        // Use parsed URL pieces when available to ensure our SSL object is respected
-        host: parsedPg?.host || env('DATABASE_HOST', 'localhost'),
-        port: parsedPg?.port || env.int('DATABASE_PORT', 5432),
-        database: parsedPg?.database || env('DATABASE_NAME', 'strapi'),
-        user: parsedPg?.user || env('DATABASE_USERNAME', 'strapi'),
-        password: parsedPg?.password || env('DATABASE_PASSWORD', 'strapi'),
+        // Preserve the normalized connection string so pooled providers (e.g. Supabase) keep query params
+        ...(normalizedPgConnectionString ? { connectionString: normalizedPgConnectionString } : {}),
+        host: resolvedHost,
+        port: resolvedPort,
+        database: resolvedDatabase,
+        user: resolvedUser,
+        password: resolvedPassword,
         ssl: env.bool('DATABASE_SSL', true) && {
           key: env('DATABASE_SSL_KEY', undefined),
           cert: env('DATABASE_SSL_CERT', undefined),
@@ -72,7 +105,7 @@ export default ({ env }) => {
           rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', false),
         },
         schema: env('DATABASE_SCHEMA', 'public'),
-        ...(pgOptions ? { options: pgOptions } : {}),
+        ...(finalPgOptions ? { options: finalPgOptions } : {}),
       },
       pool: { 
         min: env.int('DATABASE_POOL_MIN', 2), 
