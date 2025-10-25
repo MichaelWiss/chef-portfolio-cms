@@ -109,6 +109,8 @@ export default ({ env }) => {
   const databaseUrl = parseUrl(env('DATABASE_URL'));
   const directProjectRef = env('SUPABASE_PROJECT_REF') || env('DATABASE_PROJECT');
   const databaseOptionsEnv = env('DATABASE_OPTIONS');
+  const poolerHostEnv = env('SUPABASE_POOLER_HOST');
+  const poolerPortEnv = env('SUPABASE_POOLER_PORT');
   const forceIpv4Lookup = toBool(env('DATABASE_FORCE_IPV4'), true);
 
   const postgresDefaults = {
@@ -138,16 +140,30 @@ export default ({ env }) => {
     }
   }
 
-  if (!usePooler && directProjectRef) {
+  if (usePooler) {
+    if (poolerHostEnv) {
+      resolvedHost = poolerHostEnv;
+    } else if (databaseUrl && databaseUrl.hostname && !databaseUrl.hostname.startsWith('db.')) {
+      resolvedHost = databaseUrl.hostname;
+    } else {
+      console.warn(
+        '[database] SUPABASE_USE_POOLER is true but SUPABASE_POOLER_HOST is not set and DATABASE_URL points to the direct host. Provide SUPABASE_POOLER_HOST (e.g. aws-xyz.pooler.supabase.com) and SUPABASE_POOLER_PORT as needed.'
+      );
+    }
+    resolvedPort = poolerPortEnv ? toInt(poolerPortEnv, 6543) : toInt(databaseUrl?.port, 6543);
+  } else if (directProjectRef) {
     resolvedHost = `db.${directProjectRef}.supabase.co`;
     resolvedPort = 5432;
     finalOptions = undefined;
   }
 
+  let ipv4ResolutionFailed = false;
   if (forceIpv4Lookup && resolvedHost) {
     const ipv4 = resolveIpv4Address(resolvedHost);
     if (ipv4) {
       resolvedHost = ipv4;
+    } else if (!/^[0-9.]+$/.test(resolvedHost)) {
+      ipv4ResolutionFailed = true;
     }
   }
 
@@ -161,7 +177,13 @@ export default ({ env }) => {
       user: resolvedUser,
       options: finalOptions || 'none',
       forceIpv4Lookup,
+      ipv4ResolutionFailed,
     });
+    if (ipv4ResolutionFailed && !usePooler) {
+      console.warn(
+        '[database] No IPv4 address found for Supabase host. Consider enabling SUPABASE_USE_POOLER=true and setting SUPABASE_POOLER_HOST/SUPABASE_POOLER_PORT to Supabase\'s pooled endpoint.'
+      );
+    }
   }
 
   const connections = {
