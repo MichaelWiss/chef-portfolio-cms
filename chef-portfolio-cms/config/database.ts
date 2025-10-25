@@ -6,6 +6,9 @@ export default ({ env }) => {
   if (client === 'postgres') {
     const connectionString = env('DATABASE_URL');
 
+    const masked = connectionString.replace(/:\/\/([^:]+):([^@]+)@/, '://$1:***@');
+    console.info('[database] Using DATABASE_URL:', masked);
+
     if (!connectionString) {
       throw new Error(
         'DATABASE_URL is required when DATABASE_CLIENT=postgres. Please set it in your environment (use the Supabase pooled connection string).'
