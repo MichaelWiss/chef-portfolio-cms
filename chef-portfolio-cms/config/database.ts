@@ -1,6 +1,7 @@
 import path from 'path';
 import { Buffer } from 'buffer';
 import dns from 'dns';
+import { execFileSync } from 'child_process';
 
 try {
   if (typeof dns.setDefaultResultOrder === 'function') {
@@ -29,7 +30,7 @@ export default ({ env }) => {
   const normalizedBase64 = base64Ca ? base64Ca.trim().replace(/^"|"$/g, '').replace(/\s+/g, '') : null;
   const sslCa = normalizedBase64 ? Buffer.from(normalizedBase64, 'base64').toString('utf8') : rawCa;
 
-  const forceIpv4Lookup = env.bool('DATABASE_FORCE_IPV4', true);
+  let forceIpv4Lookup = env.bool('DATABASE_FORCE_IPV4', true);
   const databaseProjectEnv = env('DATABASE_PROJECT', undefined) as string | undefined;
   const supabaseProjectRefEnv = env('SUPABASE_PROJECT_REF', databaseProjectEnv) as string | undefined;
   const supabaseProjectRef = supabaseProjectRefEnv ? supabaseProjectRefEnv.trim() : undefined;
@@ -51,9 +52,92 @@ export default ({ env }) => {
     return null;
   };
 
-  const databaseUrl = env('DATABASE_URL', undefined) as string | undefined;
+  let databaseUrl = env('DATABASE_URL', undefined) as string | undefined;
   const databaseOptionsEnv = env('DATABASE_OPTIONS', undefined) as string | undefined;
   const databaseSslModeEnv = env('DATABASE_SSLMODE', undefined) as string | undefined;
+  const supabaseConnectionMode = env('SUPABASE_CONNECTION_MODE', 'auto').toLowerCase();
+  const enableProbe =
+    client === 'postgres' &&
+    supabaseConnectionMode !== 'manual' &&
+    env.bool('SUPABASE_ENABLE_PROBE', true);
+
+  let normalizedPgConnectionString = databaseUrl;
+  let finalPgOptions = databaseOptionsEnv || undefined;
+  let finalPgOptionsSource: 'env' | 'hostname' | 'url' | 'probe' | undefined = databaseOptionsEnv ? 'env' : undefined;
+  let finalPgSslMode = databaseSslModeEnv || undefined;
+  let connectionMode: 'standard' | 'pooler' | 'direct' = 'standard';
+  let probeAttemptsSummary: Array<{ mode: string; host: string; port?: number; success: boolean }> = [];
+
+  if (enableProbe) {
+    const resolverScript = path.join(__dirname, '..', 'scripts', 'resolve-supabase-connection.js');
+    try {
+      const execOutput = execFileSync(process.execPath, [resolverScript], {
+        cwd: path.join(__dirname, '..'),
+        env: {
+          ...process.env,
+          SUPABASE_CONNECTION_MODE: supabaseConnectionMode,
+          DATABASE_FORCE_IPV4: forceIpv4Lookup ? 'true' : 'false',
+        },
+        encoding: 'utf8',
+      });
+      const lines = execOutput.trim().split(/\r?\n/);
+      const jsonLine = lines.pop();
+      if (jsonLine) {
+        const parsed = JSON.parse(jsonLine);
+        if (parsed && parsed.success && parsed.connectionString) {
+          databaseUrl = parsed.connectionString as string;
+          normalizedPgConnectionString = parsed.connectionString as string;
+          if (parsed.options) {
+            finalPgOptions = parsed.options as string;
+            finalPgOptionsSource = 'probe';
+          } else if (!finalPgOptions) {
+            finalPgOptions = undefined;
+            finalPgOptionsSource = finalPgOptionsSource ?? 'probe';
+          }
+          if (parsed.sslmode) {
+            finalPgSslMode = parsed.sslmode as string;
+          }
+          if (parsed.lookup === 'ipv4') {
+            forceIpv4Lookup = true;
+          }
+          if (parsed.mode === 'pooler' || parsed.mode === 'direct') {
+            connectionMode = parsed.mode;
+          }
+          probeAttemptsSummary = Array.isArray(parsed.attempts)
+            ? parsed.attempts.map((attempt: any) => ({
+                mode: attempt.mode,
+                host: attempt.host,
+                port: attempt.port,
+                success: attempt.success === true,
+              }))
+            : [];
+        } else {
+          console.warn(
+            '[database] Supabase connection probe did not return a successful candidate; falling back to manual configuration.'
+          );
+        }
+      }
+    } catch (error: any) {
+      const parseJson = (value?: string) => {
+        if (!value) return null;
+        try {
+          return JSON.parse(value);
+        } catch {
+          return null;
+        }
+      };
+      const stderr = error?.stderr ? error.stderr.toString() : '';
+      const stdout = error?.stdout ? error.stdout.toString() : '';
+      const parsedError = parseJson(stderr) || parseJson(stdout);
+      const message =
+        (parsedError && parsedError.message) ||
+        error?.message ||
+        'Unknown probe failure';
+      console.warn(
+        `[database] Supabase connection probe failed (${message}). Falling back to manual configuration.`
+      );
+    }
+  }
 
   let parsedPg: {
     host: string;
@@ -62,11 +146,6 @@ export default ({ env }) => {
     user: string;
     password: string;
   } | null = null;
-  let normalizedPgConnectionString = databaseUrl;
-  let finalPgOptions = databaseOptionsEnv || undefined;
-  let finalPgOptionsSource: 'env' | 'hostname' | 'url' | undefined = databaseOptionsEnv ? 'env' : undefined;
-  let finalPgSslMode = databaseSslModeEnv || undefined;
-  let connectionMode: 'standard' | 'pooler' | 'direct' = 'standard';
 
   if (databaseUrl) {
     try {
@@ -194,6 +273,7 @@ export default ({ env }) => {
           : false,
       connectionMode,
       forceIpv4Lookup,
+      probeAttempts: probeAttemptsSummary,
     };
     console.info('[database] Resolved Postgres connection', connectionSummary);
   }
