@@ -88,29 +88,20 @@ dns.lookup(host, { family: 4, all: false }, (err, address) => {
   return null;
 };
 
-const preferIpv4Lookup: typeof dns.lookup = Object.assign(
-  (hostname: string, options: any, callback?: any) => {
-    if (typeof options === 'function') {
-      return dns.lookup(hostname, { family: 4, all: false }, options);
-    }
-    const normalized =
-      options && typeof options === 'object'
-        ? { ...options, family: 4, all: false }
-        : { family: 4, all: false };
-    return dns.lookup(hostname, normalized, callback);
-  },
-  {
-    __promisify__(hostname: string, options?: dns.LookupOptions | number) {
-      const normalized =
-        typeof options === 'number'
-          ? { family: 4, all: false }
-          : options && typeof options === 'object'
-          ? { ...options, family: 4, all: false }
-          : { family: 4, all: false };
-      return dns.promises.lookup(hostname, normalized);
-    },
+const preferIpv4Lookup: dns.LookupFunction = (
+  hostname: string,
+  options: dns.LookupAllOptions | dns.LookupOneOptions | number | dns.LookupCallback,
+  callback?: dns.LookupCallback
+) => {
+  if (typeof options === 'function') {
+    return dns.lookup(hostname, { family: 4, all: false }, options);
   }
-);
+  const normalized =
+    typeof options === 'object' && options !== null
+      ? { ...options, family: 4, all: false }
+      : { family: 4, all: false };
+  return dns.lookup(hostname, normalized as dns.LookupOptions, callback as dns.LookupCallback);
+};
 
 export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
