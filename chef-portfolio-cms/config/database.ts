@@ -11,16 +11,54 @@ try {
   // Ignore environments where DNS preference cannot be set (older Node versions)
 }
 
-const preferIpv4Lookup: typeof dns.lookup = (hostname, options, callback) => {
-  if (typeof options === 'function') {
-    return dns.lookup(hostname, { family: 4, all: false }, options);
+const normalizeLookupOptions = (
+  options?: dns.LookupOneOptions | dns.LookupAllOptions | number
+) => {
+  if (typeof options === 'number') {
+    return { family: 4, all: false };
   }
-  const normalizedOptions =
-    typeof options === 'object' && options !== null
-      ? { ...options, family: 4, all: false }
-      : { family: 4, all: false };
-  return dns.lookup(hostname, normalizedOptions as dns.LookupOptions, callback as any);
+  if (options && typeof options === 'object') {
+    return { ...options, family: 4, all: false };
+  }
+  return { family: 4, all: false };
 };
+
+function preferIpv4LookupImpl(
+  hostname: string,
+  options:
+    | dns.LookupOneOptions
+    | dns.LookupAllOptions
+    | number
+    | ((err: NodeJS.ErrnoException | null, address: string, family: number) => void)
+    | undefined,
+  callback?: (err: NodeJS.ErrnoException | null, address: string, family: number) => void
+) {
+  if (typeof options === 'function') {
+    return dns.lookup(hostname, normalizeLookupOptions(undefined), options);
+  }
+
+  return dns.lookup(
+    hostname,
+    normalizeLookupOptions(
+      options as dns.LookupOneOptions | dns.LookupAllOptions | number | undefined
+    ),
+    callback as (err: NodeJS.ErrnoException | null, address: string, family: number) => void
+  );
+}
+
+const preferIpv4Lookup: typeof dns.lookup = Object.assign(
+  preferIpv4LookupImpl as typeof dns.lookup,
+  {
+    __promisify__(hostname: string, options?: dns.LookupOneOptions | dns.LookupAllOptions | number) {
+      return dns.promises.lookup(
+        hostname,
+        normalizeLookupOptions(
+          options as dns.LookupOneOptions | dns.LookupAllOptions | number | undefined
+        )
+      ) as Promise<any>;
+    },
+  }
+);
 
 export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
