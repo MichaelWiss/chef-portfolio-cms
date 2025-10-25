@@ -88,20 +88,20 @@ dns.lookup(host, { family: 4, all: false }, (err, address) => {
   return null;
 };
 
-const preferIpv4Lookup: dns.LookupFunction = (
-  hostname: string,
-  options: dns.LookupAllOptions | dns.LookupOneOptions | number | dns.LookupCallback,
-  callback?: dns.LookupCallback
-) => {
+const preferIpv4Lookup = ((hostname: string, options?: any, callback?: any) => {
   if (typeof options === 'function') {
     return dns.lookup(hostname, { family: 4, all: false }, options);
   }
   const normalized =
-    typeof options === 'object' && options !== null
+    options && typeof options === 'object'
       ? { ...options, family: 4, all: false }
       : { family: 4, all: false };
-  return dns.lookup(hostname, normalized as dns.LookupOptions, callback as dns.LookupCallback);
-};
+  return dns.lookup(
+    hostname,
+    normalized as dns.LookupOptions,
+    callback as dns.LookupCallback
+  );
+}) as unknown as typeof dns.lookup;
 
 export default ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
