@@ -1,7 +1,8 @@
 import path from 'path';
 import { Buffer } from 'buffer';
+import * as fs from 'fs';
+import * as os from 'os';
 import dns from 'dns';
-import * as net from 'net';
 import { execFileSync } from 'child_process';
 
 try {
@@ -61,7 +62,324 @@ const preferIpv4Lookup: typeof dns.lookup = Object.assign(
   }
 );
 
-const SUPABASE_PROBE_SCRIPT = String.raw`const { Client } = require('pg');
+const SUPABASE_PROBE_SCRIPT_LINES = [
+"const { Client } = require('pg');",
+"const dns = require('dns');",
+"const dnsPromises = dns.promises;",
+"",
+"const env = process.env;",
+"",
+"const toBool = (value, fallback) => {",
+"  if (value === undefined || value === null || value === '') return fallback;",
+"  const normalized = String(value).toLowerCase();",
+"  if (normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on') return true;",
+"  if (normalized === '0' || normalized === 'false' || normalized === 'no' || normalized === 'off') return false;",
+"  return fallback;",
+"};",
+"",
+"const parseUrl = (value) => {",
+"  if (!value) return null;",
+"  try {",
+"    return new URL(value);",
+"  } catch (err) {",
+"    return null;",
+"  }",
+"};",
+"",
+"const trimLeadingSlash = (value) => {",
+"  if (!value) return value;",
+"  let result = value;",
+"  while (result.startsWith('/')) {",
+"    result = result.slice(1);",
+"  }",
+"  return result;",
+"};",
+"",
+"const extractProjectRefFromOptions = (options) => {",
+"  if (!options) return null;",
+"  const match = options.match(/project\\s*=\\s*([a-z0-9-]+)/i);",
+"  return match ? match[1] : null;",
+"};",
+"",
+"const extractProjectRefFromHost = (host) => {",
+"  if (!host) return null;",
+"  const legacy = host.match(/^db\\.([^.]+)\\.supabase\\.(co|com|net)$/);",
+"  if (legacy) return legacy[1];",
+"  const generic = host.match(/^([a-z0-9]{20,})\\.(?:[a-z0-9-]+\\.)*supabase\\.(co|com|net)$/);",
+"  return generic ? generic[1] : null;",
+"};",
+"",
+"const baseUrl = parseUrl(env.DATABASE_URL);",
+"const baseParams = baseUrl ? Object.fromEntries(baseUrl.searchParams.entries()) : {};",
+"",
+"const inferProjectRef =",
+"  env.SUPABASE_PROJECT_REF ||",
+"  env.DATABASE_PROJECT ||",
+"  extractProjectRefFromOptions(baseParams.options) ||",
+"  (baseUrl ? extractProjectRefFromHost(baseUrl.hostname) : null);",
+"",
+"const baseCredentials = {",
+"  user:",
+"    env.DATABASE_USERNAME ||",
+"    (baseUrl ? decodeURIComponent(baseUrl.username || '') : '') ||",
+"    'postgres',",
+"  password:",
+"    env.DATABASE_PASSWORD !== undefined",
+"      ? env.DATABASE_PASSWORD",
+"      : baseUrl",
+"      ? decodeURIComponent(baseUrl.password || '')",
+"      : '',",
+"  database:",
+"    env.DATABASE_NAME ||",
+"    (baseUrl ? trimLeadingSlash(baseUrl.pathname) : '') ||",
+"    'postgres',",
+"};",
+"",
+"const buildConnectionUrl = (host, port, overrides, omitKeys) => {",
+"  const userPart = encodeURIComponent(baseCredentials.user || '');",
+"  const passwordPart = baseCredentials.password ? ':' + encodeURIComponent(baseCredentials.password) : '';",
+"  const authority = userPart + passwordPart + '@' + host + (port ? ':' + port : '');",
+"  const databasePart = baseCredentials.database || 'postgres';",
+"  const url = new URL('postgresql://' + authority + '/' + databasePart);",
+"  const merged = Object.assign({}, baseParams, overrides || {});",
+"  if (omitKeys) {",
+"    for (const key of omitKeys) delete merged[key];",
+"  }",
+"  for (const key of Object.keys(merged)) {",
+"    const value = merged[key];",
+"    if (value === undefined || value === null || value === '') continue;",
+"    url.searchParams.set(key, value);",
+"  }",
+"  return url;",
+"};",
+"",
+"const attemptPatterns = {",
+"  auto: ['direct', 'pooler', 'url'],",
+"  any: ['direct', 'pooler', 'url'],",
+"  both: ['direct', 'pooler', 'url'],",
+"  direct: ['direct'],",
+"  pooler: ['pooler'],",
+"  url: ['url'],",
+"};",
+"",
+"const connectionMode = (env.SUPABASE_CONNECTION_MODE || 'auto').toLowerCase();",
+"const order = attemptPatterns[connectionMode] || attemptPatterns.auto;",
+"const forceIpv4 = toBool(env.DATABASE_FORCE_IPV4, true);",
+"const probeTimeout = parseInt(env.SUPABASE_PROBE_TIMEOUT || '', 10) || 7000;",
+"",
+"const toCandidateKey = (candidate) => candidate.mode + ':' + candidate.url.hostname + ':' + (candidate.url.port || '');",
+"const seen = new Set();",
+"const candidates = [];",
+"const attempts = [];",
+"",
+"const addCandidate = (builder) => {",
+"  const candidate = builder();",
+"  if (!candidate) return;",
+"  const key = toCandidateKey(candidate);",
+"  if (seen.has(key)) return;",
+"  seen.add(key);",
+"  candidates.push(candidate);",
+"};",
+"",
+"const buildDirectCandidate = () => {",
+"  if (!inferProjectRef) return null;",
+"  const host = env.SUPABASE_DIRECT_HOST || 'db.' + inferProjectRef + '.supabase.co';",
+"  const port = env.SUPABASE_DIRECT_PORT || '5432';",
+"  const url = buildConnectionUrl(host, port, { sslmode: baseParams.sslmode || 'require' }, ['options', 'pgbouncer', 'connection_limit']);",
+"  return { mode: 'direct', url, description: 'Supabase direct host' };",
+"};",
+"",
+"const buildPoolerCandidate = () => {",
+"  const host = env.SUPABASE_POOLER_HOST || (baseUrl ? baseUrl.hostname : null);",
+"  if (!host) return null;",
+"  const port = env.SUPABASE_POOLER_PORT || (baseUrl && baseUrl.port ? baseUrl.port : '6543');",
+"  const url = buildConnectionUrl(host, port, { sslmode: baseParams.sslmode || 'require' });",
+"  if (!url.searchParams.get('options') && inferProjectRef) {",
+"    url.searchParams.set('options', 'project=' + inferProjectRef);",
+"  }",
+"  return { mode: 'pooler', url, description: 'Supabase pooled host' };",
+"};",
+"",
+"const buildRawUrlCandidate = () => {",
+"  if (!baseUrl) return null;",
+"  const url = new URL(baseUrl.toString());",
+"  if (!url.searchParams.get('sslmode')) {",
+"    url.searchParams.set('sslmode', 'require');",
+"  }",
+"  return { mode: 'url', url, description: 'Original DATABASE_URL' };",
+"};",
+"",
+"const buildCustomIpv4Candidate = () => {",
+"  if (!env.SUPABASE_IPV4_HOST) return null;",
+"  const port = env.SUPABASE_IPV4_PORT || '5432';",
+"  const url = buildConnectionUrl(env.SUPABASE_IPV4_HOST, port, { sslmode: baseParams.sslmode || 'require' }, ['options']);",
+"  return { mode: 'direct-ipv4', url, description: 'Custom IPv4 host' };",
+"};",
+"",
+"const builders = {",
+"  direct: buildDirectCandidate,",
+"  pooler: buildPoolerCandidate,",
+"  url: buildRawUrlCandidate,",
+"};",
+"",
+"for (const entry of order) {",
+"  const builder = builders[entry];",
+"  if (builder) addCandidate(builder);",
+"}",
+"",
+"if (env.SUPABASE_IPV4_HOST) {",
+"  addCandidate(buildCustomIpv4Candidate);",
+"}",
+"",
+"if (candidates.length === 0) {",
+"  console.error(",
+"    JSON.stringify({",
+"      success: false,",
+"      message: 'No Supabase connection candidates could be derived from the environment.',",
+"      suggestions: [",
+"        'Set DATABASE_URL or DATABASE_HOST/DATABASE_PORT.',",
+"        'Provide SUPABASE_PROJECT_REF for direct host detection.',",
+"        'Override SUPABASE_CONNECTION_MODE=manual to skip probing.'",
+"      ],",
+"    })",
+"  );",
+"  process.exit(1);",
+"}",
+"",
+"const ssl = (() => {",
+"  if (toBool(env.DATABASE_SSL, true)) {",
+"    const rejectUnauthorized = toBool(env.DATABASE_SSL_REJECT_UNAUTHORIZED, false);",
+"    const config = { rejectUnauthorized };",
+"    if (env.DATABASE_SSL_CA) config.ca = env.DATABASE_SSL_CA;",
+"    if (env.DATABASE_SSL_CERT) config.cert = env.DATABASE_SSL_CERT;",
+"    if (env.DATABASE_SSL_KEY) config.key = env.DATABASE_SSL_KEY;",
+"    return config;",
+"  }",
+"  return false;",
+"})();",
+"",
+"const ensureIpv4 = async (host) => {",
+"  if (!forceIpv4) return host;",
+"  if (/^[0-9.]+$/.test(host)) return host;",
+"  try {",
+"    const lookup = await dnsPromises.lookup(host, { family: 4, all: false });",
+"    if (lookup && lookup.address) {",
+"      return lookup.address;",
+"    }",
+"  } catch (err) {",
+"    attempts.push({",
+"      mode: 'ipv4-lookup',",
+"      host,",
+"      success: false,",
+"      error: err && err.message,",
+"    });",
+"  }",
+"  return host;",
+"};",
+"",
+"const tryCandidate = async (candidate) => {",
+"  const attempt = {",
+"    mode: candidate.mode,",
+"    host: candidate.url.hostname,",
+"    port: candidate.url.port ? Number(candidate.url.port) : undefined,",
+"    description: candidate.description,",
+"  };",
+"  const clientConfig = {",
+"    connectionString: candidate.url.toString(),",
+"    ssl,",
+"    connectionTimeoutMillis: probeTimeout,",
+"  };",
+"  if (forceIpv4) {",
+"    clientConfig.lookup = (hostname, options, callback) => {",
+"      if (typeof options === 'function') {",
+"        return dns.lookup(hostname, { family: 4, all: false }, options);",
+"      }",
+"      const opts = options && typeof options === 'object'",
+"        ? Object.assign({}, options, { family: 4, all: false })",
+"        : { family: 4, all: false };",
+"      return dns.lookup(hostname, opts, callback);",
+"    };",
+"  }",
+"  const client = new Client(clientConfig);",
+"  const started = Date.now();",
+"  try {",
+"    await client.connect();",
+"    attempt.success = true;",
+"    attempt.durationMs = Date.now() - started;",
+"    const resolvedHost = await ensureIpv4(candidate.url.hostname);",
+"    if (resolvedHost !== candidate.url.hostname) {",
+"      candidate.url.hostname = resolvedHost;",
+"    }",
+"    return { success: true, attempt, resolvedHost };",
+"  } catch (error) {",
+"    attempt.success = false;",
+"    attempt.error = {",
+"      message: error && error.message,",
+"      code: error && error.code,",
+"    };",
+"    attempt.durationMs = Date.now() - started;",
+"    return { success: false, attempt };",
+"  } finally {",
+"    try {",
+"      await client.end();",
+"    } catch (err) {",
+"      // ignore",
+"    }",
+"  }",
+"};",
+"",
+"(async () => {",
+"  for (const candidate of candidates) {",
+"    const result = await tryCandidate(candidate);",
+"    attempts.push(result.attempt);",
+"    if (result.success) {",
+"      const url = candidate.url;",
+"      const host = result.resolvedHost || candidate.url.hostname;",
+"      console.log(",
+"        JSON.stringify({",
+"          success: true,",
+"          mode: candidate.mode,",
+"          host,",
+"          port: url.port ? Number(url.port) : 5432,",
+"          database: baseCredentials.database,",
+"          user: baseCredentials.user,",
+"          connectionString: url.toString(),",
+"          options: url.searchParams.get('options') || null,",
+"          sslmode: url.searchParams.get('sslmode') || null,",
+"          lookup: forceIpv4 ? 'ipv4' : 'default',",
+"          attempts,",
+"        })",
+"      );",
+"      return;",
+"    }",
+"  }",
+"",
+"  console.error(",
+"    JSON.stringify({",
+"      success: false,",
+"      message: 'All Supabase connection probes failed. Review attempts for details.',",
+"      attempts,",
+"      suggestions: [",
+"        'Verify SUPABASE_PROJECT_REF and DATABASE_URL values.',",
+"        'Ensure the database allows IPv4 connections.',",
+"        'Set SUPABASE_CONNECTION_MODE=manual to bypass probing.',",
+"      ],",
+"    })",
+"  );",
+"  process.exit(1);",
+"})().catch((error) => {",
+"  console.error(",
+"    JSON.stringify({",
+"      success: false,",
+"      message: error && error.message,",
+"      stack: error && error.stack,",
+"    })",
+"  );",
+"  process.exit(1);",
+"});",
+""];
+
+const SUPABASE_PROBE_SCRIPT_CONTENT = SUPABASE_PROBE_SCRIPT_LINES.join('\n');
 const dns = require('dns');
 
 function toBool(value, fallback) {
@@ -429,15 +747,31 @@ export default ({ env }) => {
 
   if (enableProbe) {
     try {
-      const execOutput = execFileSync(process.execPath, ['-e', SUPABASE_PROBE_SCRIPT], {
-        env: {
-          ...process.env,
-          SUPABASE_CONNECTION_MODE: supabaseConnectionMode,
-          DATABASE_FORCE_IPV4: forceIpv4Lookup ? 'true' : 'false',
-        },
-        encoding: 'utf8',
-      });
-      const lines = execOutput.trim().split(/\r?\n/);
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'supabase-probe-'));
+      const scriptPath = path.join(tmpDir, 'probe.js');
+      fs.writeFileSync(scriptPath, SUPABASE_PROBE_SCRIPT_CONTENT, 'utf8');
+      let execOutput: string | undefined;
+      try {
+        execOutput = execFileSync(process.execPath, [scriptPath], {
+          env: {
+            ...process.env,
+            SUPABASE_CONNECTION_MODE: supabaseConnectionMode,
+            DATABASE_FORCE_IPV4: forceIpv4Lookup ? 'true' : 'false',
+          },
+          encoding: 'utf8',
+        });
+      } finally {
+        try {
+          fs.rmSync(tmpDir, { recursive: true, force: true });
+        } catch {
+          // ignore cleanup errors
+        }
+      }
+      const output = execOutput ? execOutput.trim() : '';
+      if (!output) {
+        throw new Error('Supabase probe script produced no output');
+      }
+      const lines = output.split(/\r?\n/);
       const jsonLine = lines.pop();
       if (jsonLine) {
         const parsed = JSON.parse(jsonLine);
@@ -565,69 +899,6 @@ export default ({ env }) => {
   const resolvedDatabase = parsedPg?.database || env('DATABASE_NAME', 'strapi');
   const resolvedUser = parsedPg?.user || env('DATABASE_USERNAME', 'strapi');
   const resolvedPassword = parsedPg?.password || env('DATABASE_PASSWORD', 'strapi');
-
-  if (
-    client === 'postgres' &&
-    forceIpv4Lookup &&
-    typeof resolvedHost === 'string' &&
-    net.isIP(resolvedHost) === 0
-  ) {
-    try {
-      const ipv4LookupScript = String.raw`
-const dns = require('dns').promises;
-dns.lookup(process.argv[2], { family: 4, all: false })
-  .then((result) => {
-    if (result && result.address) {
-      console.log(result.address);
-    } else {
-      console.error(JSON.stringify({ error: 'IPv4 address not found' }));
-      process.exit(1);
-    }
-  })
-  .catch((err) => {
-    console.error(JSON.stringify({ error: err && err.message }));
-    process.exit(1);
-  });
-`;
-      const lookupOutput = execFileSync(
-        process.execPath,
-        ['-e', ipv4LookupScript, resolvedHost],
-        { encoding: 'utf8' }
-      )
-        .trim()
-        .split(/\r?\n/)
-        .pop();
-      if (lookupOutput && /^[0-9.]+$/.test(lookupOutput)) {
-        resolvedHost = lookupOutput;
-        if (normalizedPgConnectionString) {
-          try {
-            const normalizedUrl = new URL(normalizedPgConnectionString);
-            normalizedUrl.hostname = resolvedHost;
-            normalizedPgConnectionString = normalizedUrl.toString();
-          } catch {
-            // ignore normalization errors
-          }
-        }
-      } else if (lookupOutput) {
-        try {
-          const parsed = JSON.parse(lookupOutput);
-          if (parsed?.error) {
-            console.warn(
-              `[database] IPv4 lookup warning for host ${resolvedHost}: ${parsed.error}`
-            );
-          }
-        } catch {
-          // ignore parsing issues
-        }
-      }
-    } catch (error) {
-      console.warn(
-        `[database] IPv4 lookup failed for host ${resolvedHost}: ${
-          (error as Error)?.message || 'unknown error'
-        }`
-      );
-    }
-  }
 
   if (!finalPgOptions) {
     const derived = getSupabaseProjectOption(resolvedHost);
