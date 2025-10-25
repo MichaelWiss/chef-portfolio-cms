@@ -180,6 +180,8 @@ export default ({ env }) => {
 
   const logDbConnectionDetails = toBool(env('LOG_DB_CONNECTION_DETAILS'), false);
 
+  const shouldForceIpv4 = forceIpv4Lookup && !ipv4ResolutionFailed;
+
   if (client === 'postgres' && logDbConnectionDetails) {
     console.info('[database] Resolved Postgres connection', {
       host: resolvedHost,
@@ -187,7 +189,7 @@ export default ({ env }) => {
       database: resolvedDatabase,
       user: resolvedUser,
       options: finalOptions || 'none',
-      forceIpv4Lookup,
+      forceIpv4Lookup: shouldForceIpv4,
       ipv4ResolutionFailed,
     });
     if (ipv4ResolutionFailed && !usePooler) {
@@ -234,7 +236,7 @@ export default ({ env }) => {
           rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', false),
         },
         ...(finalOptions ? { options: finalOptions } : {}),
-        ...(forceIpv4Lookup ? { lookup: preferIpv4Lookup } : {}),
+        ...(shouldForceIpv4 ? { lookup: preferIpv4Lookup } : {}),
       },
       pool: {
         min: env.int('DATABASE_POOL_MIN', 2),
