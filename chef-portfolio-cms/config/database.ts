@@ -9,11 +9,25 @@ export default ({ env }) => {
   const normalizedBase64 = base64Ca ? base64Ca.trim().replace(/^"|"$/g, '').replace(/\s+/g, '') : null;
   const sslCa = normalizedBase64 ? Buffer.from(normalizedBase64, 'base64').toString('utf8') : rawCa;
 
-  // Helper to derive Supabase project ref from pooled hostnames
-  const supabaseProjectOption = (host?: string | null) => {
+  const databaseProjectEnv = env('DATABASE_PROJECT', undefined) as string | undefined;
+  const supabaseProjectRefEnv = env('SUPABASE_PROJECT_REF', databaseProjectEnv) as string | undefined;
+  const supabaseProjectRef = supabaseProjectRefEnv ? supabaseProjectRefEnv.trim() : undefined;
+
+  type SupabaseOption = { value: string; source: 'env' | 'hostname' };
+  const getSupabaseProjectOption = (host?: string | null): SupabaseOption | null => {
+    if (supabaseProjectRef) {
+      return { value: `project=${supabaseProjectRef}`, source: 'env' };
+    }
     if (!host) return null;
-    const match = host.match(/^db\.([^.]+)\.supabase\.co$/);
-    return match ? `project=${match[1]}` : null;
+    const legacyMatch = host.match(/^db\.([^.]+)\.supabase\.(co|com|net)$/);
+    if (legacyMatch) {
+      return { value: `project=${legacyMatch[1]}`, source: 'hostname' };
+    }
+    const bareMatch = host.match(/^([^.]+)\.supabase\.(co|com|net)$/);
+    if (bareMatch && /^[a-z0-9]{20}$/i.test(bareMatch[1])) {
+      return { value: `project=${bareMatch[1]}`, source: 'hostname' };
+    }
+    return null;
   };
 
   const databaseUrl = env('DATABASE_URL', undefined) as string | undefined;
@@ -29,6 +43,7 @@ export default ({ env }) => {
   } | null = null;
   let normalizedPgConnectionString = databaseUrl;
   let finalPgOptions = databaseOptionsEnv || undefined;
+  let finalPgOptionsSource: 'env' | 'hostname' | 'url' | undefined = databaseOptionsEnv ? 'env' : undefined;
   let finalPgSslMode = databaseSslModeEnv || undefined;
 
   if (databaseUrl) {
@@ -36,10 +51,16 @@ export default ({ env }) => {
       const url = new URL(databaseUrl);
       const existingOptions = url.searchParams.get('options') || undefined;
       const existingSslMode = url.searchParams.get('sslmode') || undefined;
-      const supabaseOptionFromUrl = supabaseProjectOption(url.hostname) || undefined;
+      const supabaseOptionFromUrl = getSupabaseProjectOption(url.hostname);
 
       if (!finalPgOptions) {
-        finalPgOptions = existingOptions || supabaseOptionFromUrl;
+        if (existingOptions) {
+          finalPgOptions = existingOptions;
+          finalPgOptionsSource = 'url';
+        } else if (supabaseOptionFromUrl) {
+          finalPgOptions = supabaseOptionFromUrl.value;
+          finalPgOptionsSource = supabaseOptionFromUrl.source;
+        }
       }
 
       if (finalPgOptions) {
@@ -74,7 +95,35 @@ export default ({ env }) => {
   const resolvedPassword = parsedPg?.password || env('DATABASE_PASSWORD', 'strapi');
 
   if (!finalPgOptions) {
-    finalPgOptions = supabaseProjectOption(resolvedHost) || undefined;
+    const derived = getSupabaseProjectOption(resolvedHost);
+    if (derived) {
+      finalPgOptions = derived.value;
+      finalPgOptionsSource = derived.source;
+    }
+  }
+
+  const isSupabaseHost =
+    typeof resolvedHost === 'string' && resolvedHost.includes('.supabase.');
+  if (client === 'postgres' && isSupabaseHost && !finalPgOptions) {
+    console.warn(
+      '[database] Supabase host detected but no project option provided. Set SUPABASE_PROJECT_REF or DATABASE_OPTIONS to avoid pooled connection errors.'
+    );
+  }
+
+  const logDbConnectionDetails = env.bool('LOG_DB_CONNECTION_DETAILS', false);
+  if (client === 'postgres' && logDbConnectionDetails) {
+    const connectionSummary = {
+      host: resolvedHost,
+      port: resolvedPort,
+      schema: env('DATABASE_SCHEMA', 'public'),
+      options: finalPgOptions || 'none',
+      optionsSource: finalPgOptionsSource || 'unset',
+      connectionStringIncludesOptions:
+        typeof normalizedPgConnectionString === 'string'
+          ? normalizedPgConnectionString.includes('options=')
+          : false,
+    };
+    console.info('[database] Resolved Postgres connection', connectionSummary);
   }
 
   const connections = {
