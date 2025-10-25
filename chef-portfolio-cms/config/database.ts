@@ -28,7 +28,13 @@ export default ({ env }) => {
     }
   };
   const parsedPg = parsePgUrl(env('DATABASE_URL'));
-  const pgOptions = parsedPg?.options || env('DATABASE_OPTIONS');
+  const supabaseOptions = () => {
+    const host = parsedPg?.host || env('DATABASE_HOST');
+    if (!host) return null;
+    const match = host.match(/^db\.([^.]+)\.supabase\.co$/);
+    return match ? `project=${match[1]}` : null;
+  };
+  const pgOptions = parsedPg?.options || env('DATABASE_OPTIONS') || supabaseOptions();
 
   const connections = {
     mysql: {
